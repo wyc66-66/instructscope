@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>InstructScope · Instruction Perturbation Reliability</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="vendor/chart.umd.min.js"></script>
 <style>
   :root { --bg:#f6f8fb; --card:#fff; --ink:#1c2733; --mut:#6b7a8d; --line:#e3e9f0; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,6 +31,7 @@
   .tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
   .tag.ok { background: #e3f4e8; color: #1e8449; }
   .tag.fail { background: #fbe6e5; color: #c0392b; }
+  .tag.na { background: #eef1f5; color: #6b7a8d; }
   .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
   .filters button { border: 1px solid var(--line); background: #fff; padding: 5px 12px; border-radius: 20px;
                      font-size: 12px; cursor: pointer; color: var(--ink); }
@@ -57,7 +58,7 @@
       <div class="chartbox"><canvas id="chartRate"></canvas></div>
     </div>
     <div class="panel">
-      <h3>Saliency bias <small>· fallback colour under ambiguous instructions</small></h3>
+      <h3>Default-choice bias <small>· fallback colour under underspecified instructions</small></h3>
       <div class="chartbox"><canvas id="chartSal"></canvas></div>
       <p class="muted" id="salNote" style="margin-top:8px"></p>
     </div>
@@ -76,9 +77,11 @@
 
 <script>
 const FAM_LABELS = { canonical:"Canonical", paraphrase:"Paraphrase", oov:"Out-of-vocab",
-                     coref:"Coreference", compound:"Compound", ambiguous:"Ambiguous" };
+                     coref:"Coreference", compound:"Compound", ambiguous:"Ambiguous", vacuous:"Vacuous deixis" };
+const COLOR_HEX = { red:"#c0392b", blue:"#2471a3", green:"#1e8449", yellow:"#d4ac0d", purple:"#7d3c98", orange:"#e67e22" };
 let summary = null;
 let activeFam = "all";
+let chartRate = null, chartSal = null;
 
 async function load() {
   const res = await fetch("/api/summary");
@@ -94,34 +97,44 @@ function render() {
   renderGrid();
 }
 
+function rateOf(fam) {
+  const f = summary.per_family.find(x => x.family === fam);
+  return f && f.rate != null ? f.rate : null;
+}
+
 function renderKpis() {
   const f = summary.per_family;
-  const strong = f.filter(x => x.rate >= 0.8).length;
-  const weak = f.filter(x => x.rate < 0.4).length;
-  const most = summary.saliency_most;
+  const grounded = f.filter(x => x.rate != null);
+  const strong = grounded.filter(x => x.rate >= 0.8).length;
+  const weak = grounded.filter(x => x.rate < 0.6).length;
+  const am = summary.default_analysis.ambiguous;
+  const most = am.most;
+  const nCells = summary.meta.families.length * summary.meta.colors.length * summary.meta.variants;
   const el = document.getElementById("kpis");
   el.innerHTML = `
-    <div class="kpi"><div class="lab">Cells evaluated</div><div class="val">${summary.meta.families.length * summary.meta.colors.length * summary.meta.variants}</div>
-      <div class="sub">6 families · 4 colours · ${summary.meta.variants} variants</div></div>
-    <div class="kpi"><div class="lab">Lexical robustness</div><div class="val">100%</div>
-      <div class="sub">paraphrase / oov / compound absorbed</div></div>
-    <div class="kpi"><div class="lab">Pragmatic fragility</div><div class="val">${weak}/6</div>
-      <div class="sub">coref & ambiguous drop below 60%</div></div>
-    <div class="kpi"><div class="lab">Saliency fallback</div><div class="val">${most.colour}</div>
-      <div class="sub">${most.count}/${most.total} ambiguous → Fisher p=${summary.fisher_p.toFixed(4)}</div></div>`;
+    <div class="kpi"><div class="lab">Cells evaluated</div><div class="val">${nCells}</div>
+      <div class="sub">${summary.meta.families.length} families · ${summary.meta.colors.length} colours · ${summary.meta.variants} variants</div></div>
+    <div class="kpi"><div class="lab">Lexical robustness</div><div class="val">${strong}</div>
+      <div class="sub">families fully absorbed (≥80%)</div></div>
+    <div class="kpi"><div class="lab">Pragmatic fragility</div><div class="val">${weak}</div>
+      <div class="sub">families below 60% grounded success</div></div>
+    <div class="kpi"><div class="lab">Default fallback</div><div class="val">${most.colour ?? "—"}</div>
+      <div class="sub">${am.n_grounded}/${am.n} ambiguous cells → uniform χ² p=${(am.uniform_p ?? 0).toFixed(4)}</div></div>`;
 }
 
 function renderRate() {
   const fs = summary.per_family;
-  const ctx = document.getElementById("chartRate");
-  new Chart(ctx, {
+  const labels = fs.map(f => FAM_LABELS[f.family] || f.family);
+  const data = fs.map(f => f.rate != null ? +(f.rate * 100).toFixed(1) : null);
+  if (chartRate) chartRate.destroy();
+  chartRate = new Chart(document.getElementById("chartRate"), {
     type: "bar",
     data: {
-      labels: fs.map(f => FAM_LABELS[f.family] || f.family),
+      labels,
       datasets: [{
-        label: "success rate",
-        data: fs.map(f => +(f.rate * 100).toFixed(1)),
-        backgroundColor: fs.map(f => f.rate >= 0.8 ? "#2e86c1" : f.rate >= 0.4 ? "#f39c12" : "#c0392b"),
+        label: "grounded success",
+        data,
+        backgroundColor: fs.map(f => f.rate == null ? "#b6c2cf" : f.rate >= 0.8 ? "#2e86c1" : f.rate >= 0.4 ? "#f39c12" : "#c0392b"),
         borderColor: "#1c2733", borderWidth: 0.8,
       }]
     },
@@ -137,15 +150,15 @@ function renderRate() {
 
 function renderSal() {
   const colors = summary.meta.colors;
-  const sal = summary.saliency;
-  const total = summary.saliency_most.total;
+  const sal = summary.default_analysis.ambiguous;
   const ctx = document.getElementById("chartSal");
-  new Chart(ctx, {
+  if (chartSal) chartSal.destroy();
+  chartSal = new Chart(ctx, {
     type: "bar",
     data: {
       labels: colors.map(c => c.charAt(0).toUpperCase() + c.slice(1)),
-      datasets: [{ label: "fallbacks", data: colors.map(c => sal[c] || 0),
-        backgroundColor: colors.map(c => ({red:"#c0392b",blue:"#2471a3",green:"#1e8449",yellow:"#d4ac0d",purple:"#7d3c98",orange:"#e67e22"}[c])),
+      datasets: [{ label: "fallbacks", data: colors.map(c => sal.counts[c] || 0),
+        backgroundColor: colors.map(c => COLOR_HEX[c] || "#999"),
         borderColor: "#1c2733", borderWidth: 0.8 }]
     },
     options: {
@@ -157,8 +170,9 @@ function renderSal() {
     }
   });
   document.getElementById("salNote").textContent =
-    `Unconstrained instructions ("pick up a cube") fall back to ${summary.saliency_most.colour} ` +
-    `${summary.saliency_most.count}/${total} times — a stable visual-saliency prior, not noise.`;
+    `Underspecified instructions ("pick up a cube") fall back to ${sal.most.colour} ` +
+    `${sal.most.count}/${sal.n_grounded} times — a stable visual-saliency prior, not noise ` +
+    `(χ² vs uniform p=${(sal.uniform_p ?? 0).toFixed(4)}).`;
 }
 
 function renderFilters() {
@@ -179,14 +193,19 @@ function renderGrid() {
   fetch("/sweep.json").then(res => res.json()).then(data => {
     let rows = data.records;
     if (activeFam !== "all") rows = rows.filter(r => r.family === activeFam);
-    tb.innerHTML = rows.map(r => `
-      <tr>
+    tb.innerHTML = rows.map(r => {
+      let tag = '<span class="tag na">—</span>';
+      if (r.success === true) tag = '<span class="tag ok">grounded</span>';
+      else if (r.success === false) tag = '<span class="tag fail">missed</span>';
+      else tag = '<span class="tag na">default</span>';
+      return `<tr>
         <td>${FAM_LABELS[r.family] || r.family}</td>
-        <td>${r.color}</td>
+        <td>${r.target ?? "—"}</td>
         <td>${r.instruction}</td>
         <td>${r.predicted ?? "—"}</td>
-        <td><span class="tag ${r.success ? "ok" : "fail"}">${r.success ? "grounded" : "missed"}</span></td>
-      </tr>`).join("");
+        <td>${tag}</td>
+      </tr>`;
+    }).join("");
   });
 }
 
