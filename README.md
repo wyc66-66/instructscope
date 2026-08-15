@@ -89,3 +89,8 @@ If you use this in your work, cite it as a research artifact:
 Dong Hao (2026). InstructScope: Where instruction perturbations break
 open-vocabulary VLA policies. Technical report.
 ```
+---
+
+## Live report
+
+The technical report, figures and every number are served at **[https://wyc66-66.github.io/instructscope/](https://wyc66-66.github.io/instructscope/)**.
