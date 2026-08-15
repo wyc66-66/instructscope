@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InstructScope Technical Report</title>
+<style>
+body { font-family: 'Segoe UI', system-ui, sans-serif; max-width: 880px; margin: 0 auto;
+       padding: 42px 28px 80px; color: #1c2733; line-height: 1.65; background: #fff; }
+h1 { font-size: 26px; border-bottom: 3px solid #1c4e6f; padding-bottom: 10px; }
+h2 { font-size: 19px; margin-top: 34px; color: #1c4e6f; }
+h3 { font-size: 15px; margin-top: 24px; }
+table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 13.5px; }
+th, td { border: 1px solid #e3e9f0; padding: 7px 10px; text-align: left; }
+th { background: #f2f6fa; }
+img { max-width: 100%; border: 1px solid #e3e9f0; border-radius: 8px; margin: 10px 0; }
+blockquote { border-left: 4px solid #1c4e6f; margin: 14px 0; padding: 4px 16px; background: #f2f6fa; }
+code { background: #f2f6fa; padding: 2px 5px; border-radius: 4px; font-size: 13px; }
+</style></head><body>
+<h1>InstructScope: Where Instruction Perturbations Break Open-Vocabulary VLA Policies</h1>
+<p><em>An empirical reliability boundary of language-grounded robot manipulation</em></p>
+<p><strong>Model under test:</strong> Qwen2.5-VL-3B-Instruct (open-vocabulary multimodal policy backbone)
+<strong>Task:</strong> tabletop pick-and-place on a custom <code>MultiLift</code> robosuite environment (four colour-distinct cubes)
+<strong>Metric:</strong> grounded-success rate — the fraction of instructions whose grounded colour matched the intended target</p>
+<hr />
+<h2>Abstract</h2>
+<p>Open-vocabulary vision-language-action (VLA) policies promise to generalise
+to instructions that were never seen during training. But how <em>far</em> does that
+generalisation reach? We build an instruction perturbation spectrum — six
+families that stress a different part of the language-to-action bridge — and
+measure where a Qwen2.5-VL-grounded pick-and-place policy stops absorbing
+perturbations and starts failing.</p>
+<p>The result is a crisp boundary. <strong>Lexical</strong> perturbations (paraphrase,
+out-of-vocabulary colour words, compound instructions) are absorbed with
+100% grounding reliability. <strong>Pragmatic</strong> perturbations are not: deictic /
+coreference instructions (<code>pick up that cube</code>, <code>the one on the left</code>) drop to
+55%, and unconstrained instructions (<code>pick up a cube</code>) fall to 25% — and the
+failures are not random. Under ambiguity the policy falls back to a single
+visually salient colour with perfect consistency, revealing a <em>saliency bias</em>
+inherited from its training distribution.</p>
+<h2>1. Motivation</h2>
+<p>VLA policies are typically evaluated on the <em>literal</em> instruction — a policy
+either picks the right object or it does not. Real users do not issue literal
+instructions. They paraphrase, they say <code>it</code> instead of <code>the red cube</code>, they
+describe objects with words the policy has never seen, and they occasionally
+leave the target under-specified.</p>
+<p>If a policy is brittle to these real-world instruction forms, its deployment
+reliability cannot be read off a single-task success rate. This project
+measures the <strong>instruction perturbation spectrum</strong> directly, and locates the
+boundary between perturbations that are absorbed and perturbations that break
+the policy.</p>
+<h2>2. The perturbation spectrum</h2>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Example</th>
+<th>What it stresses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>canonical</td>
+<td><code>Pick up the red cube.</code></td>
+<td>reference baseline</td>
+</tr>
+<tr>
+<td>paraphrase</td>
+<td><code>Please take the red block.</code></td>
+<td>synonym / syntax variation</td>
+</tr>
+<tr>
+<td>oov</td>
+<td><code>Pick up the vermilion cube.</code></td>
+<td>composition from rare colour words</td>
+</tr>
+<tr>
+<td>coref</td>
+<td><code>Grab it — the red one.</code></td>
+<td>deixis and spatial reference resolution</td>
+</tr>
+<tr>
+<td>compound</td>
+<td><code>Grasp the red cube and raise it above the table.</code></td>
+<td>segmentation and sequencing</td>
+</tr>
+<tr>
+<td>ambiguous</td>
+<td><code>Pick up a cube.</code></td>
+<td>default target selection under underspecification</td>
+</tr>
+</tbody>
+</table>
+<p>Every cell is fully deterministic: 4 colours × 5 variants × fixed scene.
+Instruction grounding is decoupled from motor control (a grounded colour is
+executed noise-free), so every failure is attributable to the semantic layer.</p>
+<h2>3. Results</h2>
+<p><img alt="Success rates" src="../figures/fig1_success_rates.png" /></p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>n</th>
+<th>Success</th>
+<th>Wilson 95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>canonical</td>
+<td>20</td>
+<td>100%</td>
+<td>[83.9%, 100%]</td>
+</tr>
+<tr>
+<td>paraphrase</td>
+<td>20</td>
+<td>100%</td>
+<td>[83.9%, 100%]</td>
+</tr>
+<tr>
+<td>oov</td>
+<td>20</td>
+<td>100%</td>
+<td>[83.9%, 100%]</td>
+</tr>
+<tr>
+<td>compound</td>
+<td>20</td>
+<td>100%</td>
+<td>[83.9%, 100%]</td>
+</tr>
+<tr>
+<td>coref</td>
+<td>20</td>
+<td>55%</td>
+<td>[34.2%, 74.2%]</td>
+</tr>
+<tr>
+<td>ambiguous</td>
+<td>20</td>
+<td>25%</td>
+<td>[11.2%, 46.9%]</td>
+</tr>
+</tbody>
+</table>
+<h3>3.1 Lexical robustness: perturbations are absorbed</h3>
+<p>The first four families are <em>semantically equivalent</em> ways of referring to
+the same target, and the policy absorbs all of them. Two findings stand out:</p>
+<ul>
+<li><strong>Out-of-vocabulary composition works.</strong> <code>vermilion</code> for red, <code>cobalt</code>
+  for blue, <code>viridian</code> for green — none of these colour words are in the
+  canonical vocabulary, yet the model grounds them to the correct object
+  every time. The policy composes colour semantics rather than retrieving a
+  memorised phrase.</li>
+<li><strong>Compounding is not a failure mode here.</strong> Splitting attention across
+  <code>pick up the red cube</code> and <code>hold it steady</code> does not confuse target
+  selection.</li>
+</ul>
+<h3>3.2 Pragmatic fragility: the boundary is real</h3>
+<p><strong>Coreference instructions drop to 55%.</strong> The failures cluster into two
+mechanisms:</p>
+<ul>
+<li><em>Vacuous deixis:</em> <code>pick up that cube</code> — with no disambiguating content, the
+  model falls back to a position heuristic (it tends to choose the cube near
+  the visual centre of the agentview image).</li>
+<li><em>Spatial reference error:</em> <code>the one that is leftmost</code> / <code>nearest to you</code>
+  — the model's spatial-preposition grounding is unreliable in this camera
+  frame.</li>
+</ul>
+<p><strong>Ambiguous instructions drop to 25%, and the failures are systematic.</strong></p>
+<p><img alt="Saliency bias" src="../figures/fig2_saliency_bias.png" /></p>
+<p><code>Pick up any cube you like</code> is grounded to <strong>yellow</strong> on 15/15 non-yellow
+targets. The policy has a strong, deterministic saliency prior: when the
+instruction imposes no constraint, the visually salient object wins. This is
+not noise — it is a measurable bias in the open-vocabulary policy's default
+behaviour.</p>
+<h3>3.3 Confusion structure</h3>
+<p><img alt="Confusion" src="../figures/fig3_confusion.png" /></p>
+<p>The confusion matrix across all perturbation families confirms the story:
+the diagonal dominates (target-preserving grounding), and the only notable
+off-diagonal mass flows <em>toward</em> the salient colour under ambiguous
+instructions.</p>
+<h2>4. Discussion</h2>
+<p>Our sweep draws a clear <strong>reliability boundary of the open-vocabulary
+instruction space</strong>:</p>
+<ol>
+<li><strong>Lexical novelty is a solved problem for this policy.</strong> Words the policy
+   has never been instruction-tuned on are composed into correct object
+   references.</li>
+<li><strong>Pragmatic uncertainty is unsolved.</strong> The moment the instruction relies
+   on context (deixis, spatial deixis, underspecification), grounding
+   reliability collapses — and in a <em>biased</em> rather than random direction.</li>
+</ol>
+<p>This has a concrete deployment implication: an open-vocabulary VLA cannot be
+trusted with under-specified instructions; a safe deployment either resolves
+references before execution or treats <code>pick up a cube</code> as a request for
+human clarification. The saliency prior is stable and measurable, which means
+it can be corrected — a natural next step is calibrating the fallback
+distribution against a human-annotated preference prior.</p>
+<h2>5. Reproducibility</h2>
+<ul>
+<li><strong>Model:</strong> <code>Qwen/Qwen2.5-VL-3B-Instruct</code>, bf16, offline</li>
+<li><strong>Environment:</strong> custom <code>MultiLift</code> (robosuite 1.4.1 / MuJoCo 2.3.7),
+  deterministic per seed, agentview camera @ 256×256</li>
+<li><strong>Execution:</strong> CPU software rendering (llvmpipe); CUDA for the VLM</li>
+<li><strong>Full sweep:</strong> 120 cells (6 families × 4 colours × 5 variants)</li>
+<li><strong>Data:</strong> <code>data/sweep/sweep.json</code>, <code>data/sweep/summary.json</code></li>
+</ul>
+</body></html>
