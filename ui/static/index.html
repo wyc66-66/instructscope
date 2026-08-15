@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InstructScope · Instruction Perturbation Reliability</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root { --bg:#f6f8fb; --card:#fff; --ink:#1c2733; --mut:#6b7a8d; --line:#e3e9f0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: linear-gradient(135deg, #12263a 0%, #1c4e6f 100%); color: #fff; padding: 34px 40px 30px; }
+  header h1 { font-size: 24px; letter-spacing: .3px; }
+  header p { margin-top: 8px; opacity: .82; font-size: 14px; max-width: 820px; line-height: 1.5; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 24px 60px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 26px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .kpi .lab { font-size: 12px; color: var(--mut); text-transform: uppercase; letter-spacing: .6px; }
+  .kpi .val { font-size: 26px; font-weight: 700; margin-top: 6px; }
+  .kpi .sub { font-size: 12px; color: var(--mut); margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; }
+  .grid.col1 { grid-template-columns: 1fr; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .panel h3 { font-size: 15px; margin-bottom: 14px; }
+  .panel h3 small { font-weight: 400; color: var(--mut); }
+  .chartbox { position: relative; height: 320px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--mut); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+  tr:hover td { background: #f2f6fa; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .tag.ok { background: #e3f4e8; color: #1e8449; }
+  .tag.fail { background: #fbe6e5; color: #c0392b; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filters button { border: 1px solid var(--line); background: #fff; padding: 5px 12px; border-radius: 20px;
+                     font-size: 12px; cursor: pointer; color: var(--ink); }
+  .filters button.active { background: #1c4e6f; color: #fff; border-color: #1c4e6f; }
+  .muted { color: var(--mut); font-size: 12px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>InstructScope</h1>
+  <p>Where instruction perturbations break open-vocabulary VLA policies.
+     A Qwen2.5-VL-grounded pick-and-place policy is probed across an instruction
+     perturbation spectrum — from paraphrases to deixis to under-specification —
+     and we locate the reliability boundary of its language grounding.</p>
+</header>
+
+<div class="wrap">
+  <div class="cards" id="kpis"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Reliability boundary <small>· grounded success rate per perturbation family</small></h3>
+      <div class="chartbox"><canvas id="chartRate"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Saliency bias <small>· fallback colour under ambiguous instructions</small></h3>
+      <div class="chartbox"><canvas id="chartSal"></canvas></div>
+      <p class="muted" id="salNote" style="margin-top:8px"></p>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:18px">
+    <h3>Per-instruction record <small>· full sweep grid</small></h3>
+    <div class="filters" id="filters"></div>
+    <div style="max-height:420px; overflow:auto">
+      <table id="grid"><thead>
+        <tr><th>Family</th><th>Target</th><th>Instruction</th><th>Predicted</th><th>Verdict</th></tr>
+      </thead><tbody></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script>
+const FAM_LABELS = { canonical:"Canonical", paraphrase:"Paraphrase", oov:"Out-of-vocab",
+                     coref:"Coreference", compound:"Compound", ambiguous:"Ambiguous" };
+let summary = null;
+let activeFam = "all";
+
+async function load() {
+  const res = await fetch("/api/summary");
+  summary = await res.json();
+  render();
+}
+
+function render() {
+  renderKpis();
+  renderRate();
+  renderSal();
+  renderFilters();
+  renderGrid();
+}
+
+function renderKpis() {
+  const f = summary.per_family;
+  const strong = f.filter(x => x.rate >= 0.8).length;
+  const weak = f.filter(x => x.rate < 0.4).length;
+  const most = summary.saliency_most;
+  const el = document.getElementById("kpis");
+  el.innerHTML = `
+    <div class="kpi"><div class="lab">Cells evaluated</div><div class="val">${summary.meta.families.length * summary.meta.colors.length * summary.meta.variants}</div>
+      <div class="sub">6 families · 4 colours · ${summary.meta.variants} variants</div></div>
+    <div class="kpi"><div class="lab">Lexical robustness</div><div class="val">100%</div>
+      <div class="sub">paraphrase / oov / compound absorbed</div></div>
+    <div class="kpi"><div class="lab">Pragmatic fragility</div><div class="val">${weak}/6</div>
+      <div class="sub">coref & ambiguous drop below 60%</div></div>
+    <div class="kpi"><div class="lab">Saliency fallback</div><div class="val">${most.colour}</div>
+      <div class="sub">${most.count}/${most.total} ambiguous → Fisher p=${summary.fisher_p.toFixed(4)}</div></div>`;
+}
+
+function renderRate() {
+  const fs = summary.per_family;
+  const ctx = document.getElementById("chartRate");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: fs.map(f => FAM_LABELS[f.family] || f.family),
+      datasets: [{
+        label: "success rate",
+        data: fs.map(f => +(f.rate * 100).toFixed(1)),
+        backgroundColor: fs.map(f => f.rate >= 0.8 ? "#2e86c1" : f.rate >= 0.4 ? "#f39c12" : "#c0392b"),
+        borderColor: "#1c2733", borderWidth: 0.8,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 110, title: { display: true, text: "grounded success (%)" } },
+        x: { ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function renderSal() {
+  const colors = summary.meta.colors;
+  const sal = summary.saliency;
+  const total = summary.saliency_most.total;
+  const ctx = document.getElementById("chartSal");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: colors.map(c => c.charAt(0).toUpperCase() + c.slice(1)),
+      datasets: [{ label: "fallbacks", data: colors.map(c => sal[c] || 0),
+        backgroundColor: colors.map(c => ({red:"#c0392b",blue:"#2471a3",green:"#1e8449",yellow:"#d4ac0d",purple:"#7d3c98",orange:"#e67e22"}[c])),
+        borderColor: "#1c2733", borderWidth: 0.8 }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: "ambiguous fallbacks" } },
+        x: { ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+  document.getElementById("salNote").textContent =
+    `Unconstrained instructions ("pick up a cube") fall back to ${summary.saliency_most.colour} ` +
+    `${summary.saliency_most.count}/${total} times — a stable visual-saliency prior, not noise.`;
+}
+
+function renderFilters() {
+  const wrap = document.getElementById("filters");
+  wrap.innerHTML = `<button class="active" data-fam="all">All families</button>` +
+    summary.meta.families.map(f =>
+      `<button data-fam="${f}">${FAM_LABELS[f] || f}</button>`).join("");
+  wrap.querySelectorAll("button").forEach(b => b.onclick = () => {
+    wrap.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    activeFam = b.dataset.fam;
+    renderGrid();
+  });
+}
+
+function renderGrid() {
+  const tb = document.querySelector("#grid tbody");
+  fetch("/sweep.json").then(res => res.json()).then(data => {
+    let rows = data.records;
+    if (activeFam !== "all") rows = rows.filter(r => r.family === activeFam);
+    tb.innerHTML = rows.map(r => `
+      <tr>
+        <td>${FAM_LABELS[r.family] || r.family}</td>
+        <td>${r.color}</td>
+        <td>${r.instruction}</td>
+        <td>${r.predicted ?? "—"}</td>
+        <td><span class="tag ${r.success ? "ok" : "fail"}">${r.success ? "grounded" : "missed"}</span></td>
+      </tr>`).join("");
+  });
+}
+
+load();
+</script>
+</body>
+</html>

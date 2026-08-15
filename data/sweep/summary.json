@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "colors": [
+      "red",
+      "blue",
+      "green",
+      "yellow"
+    ],
+    "families": [
+      "canonical",
+      "paraphrase",
+      "oov",
+      "coref",
+      "compound",
+      "ambiguous"
+    ],
+    "variants": 5,
+    "seeds": [
+      0
+    ],
+    "image_size": [
+      256,
+      256
+    ],
+    "scene": "data/scenes/scene_seed0.png"
+  },
+  "per_family": [
+    {
+      "family": "canonical",
+      "n": 20,
+      "success": 20,
+      "rate": 1.0,
+      "ci_lo": 0.8388698745050667,
+      "ci_hi": 1.0
+    },
+    {
+      "family": "paraphrase",
+      "n": 20,
+      "success": 20,
+      "rate": 1.0,
+      "ci_lo": 0.8388698745050667,
+      "ci_hi": 1.0
+    },
+    {
+      "family": "oov",
+      "n": 20,
+      "success": 20,
+      "rate": 1.0,
+      "ci_lo": 0.8388698745050667,
+      "ci_hi": 1.0
+    },
+    {
+      "family": "coref",
+      "n": 20,
+      "success": 11,
+      "rate": 0.55,
+      "ci_lo": 0.3420820083075997,
+      "ci_hi": 0.7418049791429071
+    },
+    {
+      "family": "compound",
+      "n": 20,
+      "success": 20,
+      "rate": 1.0,
+      "ci_lo": 0.8388698745050667,
+      "ci_hi": 1.0
+    },
+    {
+      "family": "ambiguous",
+      "n": 20,
+      "success": 5,
+      "rate": 0.25,
+      "ci_lo": 0.11186005278940309,
+      "ci_hi": 0.4687050099580636
+    }
+  ],
+  "saliency": {
+    "yellow": 20
+  },
+  "saliency_most": {
+    "colour": "yellow",
+    "count": 20,
+    "total": 20
+  },
+  "fisher_p": 0.001976284584980237,
+  "confusion": {
+    "red": {
+      "red": 22,
+      "blue": 2,
+      "green": 1,
+      "yellow": 5
+    },
+    "blue": {
+      "blue": 25,
+      "yellow": 5
+    },
+    "green": {
+      "green": 22,
+      "blue": 2,
+      "yellow": 6
+    },
+    "yellow": {
+      "yellow": 27,
+      "blue": 2,
+      "green": 1
+    }
+  }
+}

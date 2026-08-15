@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "instructscope"
+version = "0.1.0"
+description = "Where instruction perturbations break open-vocabulary VLA policies"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pillow",
+]
+
+[project.optional-dependencies]
+sim = [
+    "robosuite==1.4.1",
+    "mujoco==2.3.7",
+]
+gpu = [
+    "transformers==4.57.0",
+    "torch>=2.3",
+    "safetensors",
+    "accelerate",
+]
+paper = [
+    "matplotlib",
+    "markdown",
+]
+ui = [
+    "fastapi",
+    "uvicorn",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
