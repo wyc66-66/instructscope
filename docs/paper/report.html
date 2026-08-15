@@ -93,7 +93,7 @@ the policy.</p>
 Instruction grounding is decoupled from motor control (a grounded colour is
 executed noise-free), so every failure is attributable to the semantic layer.</p>
 <h2>3. Results</h2>
-<p><img alt="Success rates" src="figures/fig1_success_rates.png" /></p>
+<p><img alt="Success rates" src="../figures/fig1_success_rates.png" /></p>
 <table>
 <thead>
 <tr>
@@ -167,14 +167,14 @@ mechanisms:</p>
   frame.</li>
 </ul>
 <p><strong>Ambiguous instructions drop to 25%, and the failures are systematic.</strong></p>
-<p><img alt="Saliency bias" src="figures/fig2_saliency_bias.png" /></p>
+<p><img alt="Saliency bias" src="../figures/fig2_saliency_bias.png" /></p>
 <p><code>Pick up any cube you like</code> is grounded to <strong>yellow</strong> on 15/15 non-yellow
 targets. The policy has a strong, deterministic saliency prior: when the
 instruction imposes no constraint, the visually salient object wins. This is
 not noise — it is a measurable bias in the open-vocabulary policy's default
 behaviour.</p>
 <h3>3.3 Confusion structure</h3>
-<p><img alt="Confusion" src="figures/fig3_confusion.png" /></p>
+<p><img alt="Confusion" src="../figures/fig3_confusion.png" /></p>
 <p>The confusion matrix across all perturbation families confirms the story:
 the diagonal dominates (target-preserving grounding), and the only notable
 off-diagonal mass flows <em>toward</em> the salient colour under ambiguous

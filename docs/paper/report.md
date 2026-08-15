@@ -57,7 +57,7 @@ executed noise-free), so every failure is attributable to the semantic layer.
 
 ## 3. Results
 
-![Success rates](figures/fig1_success_rates.png)
+![Success rates](../figures/fig1_success_rates.png)
 
 | Family | n | Success | Wilson 95% CI |
 |---|---|---|---|
@@ -96,7 +96,7 @@ mechanisms:
 
 **Ambiguous instructions drop to 25%, and the failures are systematic.**
 
-![Saliency bias](figures/fig2_saliency_bias.png)
+![Saliency bias](../figures/fig2_saliency_bias.png)
 
 `Pick up any cube you like` is grounded to **yellow** on 15/15 non-yellow
 targets. The policy has a strong, deterministic saliency prior: when the
@@ -106,7 +106,7 @@ behaviour.
 
 ### 3.3 Confusion structure
 
-![Confusion](figures/fig3_confusion.png)
+![Confusion](../figures/fig3_confusion.png)
 
 The confusion matrix across all perturbation families confirms the story:
 the diagonal dominates (target-preserving grounding), and the only notable
