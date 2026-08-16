@@ -21,8 +21,12 @@ The result is a crisp boundary. **Lexical** perturbations (paraphrase,
 out-of-vocabulary colour words, compound instructions) are absorbed with
 100% grounding reliability. **Pragmatic** perturbations are not: deictic /
 coreference instructions (`pick up that cube`, `the one on the left`) drop to
-55%, and unconstrained instructions (`pick up a cube`) fall to 25% — and the
-failures are not random. Under under-specification the policy never grounds to
+55%, and unconstrained instructions (`pick up a cube`) fall to 25%. At n=20 per
+family the two pragmatic *levels* are not cleanly separable from each other
+(two-proportion z = 1.94, p = 0.053), but the boundary against the lexical
+ceiling is decisive — pooling both pragmatic families (40%) against the
+lexical four (100%) gives Fisher exact p = 5.8×10⁻¹⁵. The failures are not
+random. Under under-specification the policy never grounds to
 the two smaller cubes in the lower half of the agentview frame: it
 deterministically anchors to one of the two visually dominant cubes (blue,
 yellow) on all 20 trials, and *which* anchor is selected switches with the
@@ -111,6 +115,18 @@ the same target, and the policy absorbs all of them. Two findings stand out:
 
 **Coreference instructions drop to 55%, and the loss is fully explained by
 two mechanisms.**
+
+We flag the sample-size honesty up front: at n=20 per family, the two
+pragmatic families' *levels* are not cleanly separable — a two-proportion
+z-test of coref (55%, 20/20) vs ambiguous (25%, 20/20) gives z = 1.94,
+p = 0.053, and the Wilson intervals overlap (§3). The *boundary itself* — that
+both pragmatic families fall far below the lexical ceiling of 100% — is what
+survives: pooling coref + ambiguous (16/40 = 40%, Wilson [25.8%, 55.9%])
+against the four lexical families (80/80 = 100%) gives Fisher exact
+p = 5.8×10⁻¹⁵. The stronger, more robust evidence is *inside* the failures: the
+deterministic fallback anchor (§3.3) and the phrase-dependent anchor switch
+(§3.4) are each significant at p < 10⁻⁵ and are independent of how the aggregate
+levels are sliced.
 
 | Sub-family | Example | n | Success |
 |---|---|---|---|

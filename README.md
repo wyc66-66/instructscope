@@ -8,6 +8,17 @@ Qwen2.5-VL-grounded pick-and-place policy. The policy is probed across an
 coreference, compound and ambiguous instructions — in a custom multi-object
 robosuite environment.
 
+The question is a direct companion to action-space reasoning in VLA policies.
+ACoT-VLA (AgiBot, CVPR 2026) argues that the semantic-kinematic gap is best
+bridged by deliberating in the *action* space rather than detouring through
+language subtasks — but its evaluation, like every VLA today, measures
+reliability over a fixed instruction set. That leaves the *language* side of the
+bridge unmeasured: how far does open-vocabulary grounding actually reach, and
+which instruction perturbations break it? This project measures exactly that —
+the grounding reliability on which an action-space reasoner depends. If a policy
+reasons in the action space but grounds the wrong object, the reasoning is
+wasted.
+
 ## Headline finding
 
 | Family | Example | Grounded success |
@@ -49,6 +60,11 @@ instructscope/
 
 ## Reproducing the sweep
 
+**Platform:** robosuite 1.4 supports Linux and macOS only (no native Windows).
+On Windows use WSL2 with a working OpenGL setup (e.g. `apt install libegl1
+mesa-utils`), or skip the sweep entirely — `data/sweep/` is committed and the
+analysis, figures, and report reproduce from it on any OS.
+
 Rendering uses CPU software GL (`LIBGL_ALWAYS_SOFTWARE=1`, llvmpipe) so the
 MuJoCo renderer never touches WSL's unstable GPU virtualisation layer; the
 VLM still runs on CUDA.
@@ -74,7 +90,7 @@ python scripts/render_paper.py
 ```
 
 > The `TRANSFORMERS_OFFLINE=1` / `LIBGL_ALWAYS_SOFTWARE=1` prefixes are bash
-> syntax; on Windows PowerShell use `$env:TRANSFORMERS_OFFLINE="1"; ...`.
+> syntax; on PowerShell (WSL) call the same commands inside `wsl bash -c '...'`.
 
 ## Tests
 
@@ -102,14 +118,6 @@ python -m uvicorn instructscope.ui.app:app --port 8733
   control
 - **Full grid:** 6 families × 4 colours × 5 variants = 120 deterministic cells
 
-## Citation
-
-If you use this in your work, cite it as a research artifact:
-
-```
-Dong Hao (2026). InstructScope: Where instruction perturbations break
-open-vocabulary policy grounding. Technical report.
-```
 ---
 
 ## Live report

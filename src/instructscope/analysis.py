@@ -33,6 +33,23 @@ def wilson_interval(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
     return (max(0.0, centre - half), min(1.0, centre + half))
 
 
+def two_proportion_z(k1: int, n1: int, k2: int, n2: int) -> dict:
+    """Two-proportion z-test between independent binomial groups.
+
+    Used to ask whether the *observed levels* of two families (e.g.
+    coreference 55% vs ambiguous 25%) differ, beyond their overlapping Wilson
+    intervals. The two-sided p-value is from the normal approximation.
+    """
+    p1 = k1 / n1 if n1 else 0.0
+    p2 = k2 / n2 if n2 else 0.0
+    p_pool = (k1 + k2) / (n1 + n2) if (n1 + n2) else 0.0
+    se = sqrt(p_pool * (1 - p_pool) * (1 / n1 + 1 / n2))
+    z = (p1 - p2) / se if se > 0 else 0.0
+    p = 2 * (1 - stats.norm.cdf(abs(z)))
+    return {"z": float(z), "p": float(p), "p1": float(p1), "p2": float(p2),
+            "n1": n1, "n2": n2}
+
+
 def load_sweep(path: Path) -> dict:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
@@ -187,6 +204,16 @@ def summarize(data: dict) -> dict:
     amb = _ambiguous_analysis(records, colours)
     coref = _coref_analysis(records)
 
+    # Two-proportion test: are the observed levels of coreference vs ambiguous
+    # grounding distinguishable, or just sampling noise around overlapping CIs?
+    by_fam = {f["family"]: f for f in per_family}
+    pair = None
+    if "coref" in by_fam and "ambiguous" in by_fam:
+        pair = two_proportion_z(
+            by_fam["coref"]["success"], by_fam["coref"]["n"],
+            by_fam["ambiguous"]["success"], by_fam["ambiguous"]["n"],
+        )
+
     return {
         "meta": data["meta"],
         "per_family": per_family,
@@ -199,6 +226,7 @@ def summarize(data: dict) -> dict:
             "total": sum(saliency.values()),
         },
         "fisher_p": amb["phrase_anchor_p"],
+        "coref_vs_ambiguous": pair,
     }
 
 

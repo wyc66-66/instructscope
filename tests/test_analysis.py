@@ -9,6 +9,7 @@ from instructscope.analysis import (
     _ambiguous_analysis,
     _coref_analysis,
     summarize,
+    two_proportion_z,
     wilson_interval,
 )
 
@@ -113,3 +114,24 @@ class TestSummarize:
         assert pf["ambiguous"]["rate"] == 0.0
         assert s["fisher_p"] < 1.0
         assert "default_analysis" in s
+        # no coref family in this fixture -> pairwise test absent
+        assert s["coref_vs_ambiguous"] is None
+
+
+class TestTwoProportion:
+    def test_significant_difference(self):
+        # 55% (11/20) vs 25% (5/20): not significant at alpha=0.05, near threshold
+        r = two_proportion_z(11, 20, 5, 20)
+        assert r["p1"] == 0.55
+        assert r["p2"] == 0.25
+        assert r["p"] > 0.05
+
+    def test_equal_proportions(self):
+        r = two_proportion_z(10, 20, 10, 20)
+        assert r["z"] == 0.0
+        assert r["p"] == 1.0
+
+    def test_extreme_split(self):
+        # 16/40 vs 80/80: the report's pooled boundary, Fisher-verified ~6e-15
+        r = two_proportion_z(16, 40, 80, 80)
+        assert r["p"] < 1e-12
