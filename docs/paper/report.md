@@ -26,13 +26,13 @@ family the two pragmatic *levels* are not cleanly separable from each other
 (two-proportion z = 1.94, p = 0.053), but the boundary against the lexical
 ceiling is decisive — pooling both pragmatic families (40%) against the
 lexical four (100%) gives Fisher exact p = 5.8×10⁻¹⁵. The failures are not
-random. Under under-specification the policy never grounds to
-the two smaller cubes in the lower half of the agentview frame: it
-deterministically anchors to one of the two visually dominant cubes (blue,
-yellow) on all 20 trials, and *which* anchor is selected switches with the
-surface phrasing of the otherwise-equivalent instruction (Fisher exact
-p = 7.9×10⁻⁶). The failures reveal a measurable, phrase-sensitive **saliency
-prior**, not noise.
+random. Under under-specification the policy anchors to the visually dominant
+cube rather than falling back uniformly; the anchor is biased in all four
+colour-permuted layouts we test (χ² p < 10⁻⁴ each), and in the original layout
+the chosen anchor additionally switches with the surface phrasing of the
+otherwise-equivalent instruction (Fisher exact p = 7.9×10⁻⁶). The failures
+reveal a measurable **saliency prior** — layout-invariant in existence,
+layout-specific in which object it picks — not noise.
 
 ## 1. Motivation
 
@@ -75,9 +75,11 @@ the policy.
 | compound | `Grasp the red cube and raise it above the table.` | segmentation and sequencing |
 | ambiguous | `Pick up a cube.` | default target selection under underspecification |
 
-Every cell is fully deterministic: 4 colours × 5 variants × fixed scene.
-Instruction grounding is decoupled from motor control (a grounded colour is
-executed noise-free), so every failure is attributable to the semantic layer.
+Every cell is fully deterministic: 4 colours × 5 variants × fixed scene, and
+the entire grid is re-run on three colour-permuted layouts (§3.4, 480 cells
+total). Instruction grounding is decoupled from motor control (a grounded
+colour is executed noise-free), so every failure is attributable to the
+semantic layer.
 
 The ambiguous bank deliberately contains only three colour-agnostic templates;
 variants 3–4 re-present templates 0–1 across all four nominal targets, so the
@@ -124,9 +126,9 @@ both pragmatic families fall far below the lexical ceiling of 100% — is what
 survives: pooling coref + ambiguous (16/40 = 40%, Wilson [25.8%, 55.9%])
 against the four lexical families (80/80 = 100%) gives Fisher exact
 p = 5.8×10⁻¹⁵. The stronger, more robust evidence is *inside* the failures: the
-deterministic fallback anchor (§3.3) and the phrase-dependent anchor switch
-(§3.4) are each significant at p < 10⁻⁵ and are independent of how the aggregate
-levels are sliced.
+deterministic fallback anchor and the phrase-dependent anchor switch (this
+section, below) are each significant at p < 10⁻⁵ and are independent of how
+the aggregate levels are sliced.
 
 | Sub-family | Example | n | Success |
 |---|---|---|---|
@@ -167,7 +169,8 @@ form constrains the colour — yet the grounding target flips deterministically
 (Fisher exact p = 7.9×10⁻⁶). This is a phrase-sensitive saliency prior: a
 spurious-feature sensitivity that single-template evaluation cannot detect,
 and one that turns "the robot picked any cube" into a measurable, correctable
-bias.
+bias. Whether that *phrase-sensitivity* is stable or a property of this one
+layout is answered by the cross-layout sweep (§3.4): it does not transfer.
 
 ### 3.3 Confusion structure
 
@@ -177,6 +180,42 @@ The confusion matrix across all perturbation families confirms the story:
 the diagonal dominates (target-preserving grounding), and the only notable
 off-diagonal mass flows *toward the two visually dominant anchor colours*
 (blue and yellow) under ambiguous and vacuous-deictic instructions.
+
+### 3.4 Cross-layout stability: the boundary is a property of the task, the anchor is not
+
+Every result so far is one deterministic layout. To separate "this policy
+cannot ground under-specification" from "this policy cannot ground *this
+scene*", the full 120-cell grid was re-run on three colour→position
+permutations of the same task — the four cubes keep their grid slots, but
+colours are reassigned so that no colour sits at the same slot twice across
+layouts (`data/sweep_v1..v3`, same 120 cells, same protocol).
+
+![Cross-layout](../figures/fig4_cross_layout.png)
+
+**The pragmatic boundary is layout-invariant.** Per-family success is
+identical in all four layouts: the four lexical families at 100% every time,
+coref at 55%, ambiguous at 25%. The lexical-versus-pragmatic split is
+significant in each of the four (Fisher exact p = 5.8×10⁻¹⁵ per layout) —
+the boundary does not move when the layout moves. The 100%/55%/25% profile is
+a property of *under-specification*, not of this scene.
+
+**The biased fallback survives; the anchor colour does not.** In all four
+layouts the ambiguous fallback is strongly non-uniform (χ² p = 7.9×10⁻⁵ in the
+weakest case, p < 10⁻¹³ in three of four), so the saliency prior is not a
+one-scene artefact. But the anchor is layout-specific: the original layout
+favours blue/yellow, while the permuted layouts collapse every phrase onto a
+single colour — green on L1 and L3, blue on L2. The model's "most salient
+cube" is a property of *that* layout, not a memorised colour preference.
+
+**The phrase-sensitivity does not transfer.** The clean phrase switch of §3.2
+(`pick up a cube` → blue, `pick up any cube you like` → yellow) reproduces in
+exactly one of the four layouts; in the other three, all three surface forms
+land on the same anchor. The prior is real and layout-invariant in *existence
+and direction* (biased, toward the visually dominant cube), but its *fine
+structure* — which phrase lands on which anchor — is a spurious property of
+the original scene. The deployment takeaway survives: under-specification
+cannot be trusted, and the fallback is biased, not uniform. The claim that
+must be softened is that the bias is *phrase-controllable*.
 
 ## 4. Discussion
 
@@ -201,11 +240,12 @@ for human clarification. Because the saliency prior is stable, deterministic
 Three directions follow from the boundary this study draws.
 
 First, **turn the saliency prior into a calibrated fallback.** The bias is
-deterministic and measurable, so it can be inverted: re-weight the fallback
-distribution against a human-annotated preference prior, then check whether
-the phrase-dependence disappears once the model is explicitly asked to flag
-its own uncertainty (`I am not sure which cube`) before grounding. This is the
-experiment that decides whether the bias is correctable or structural. Second,
+measurable and layout-invariant in existence, so it can be inverted:
+re-weight the fallback distribution against a human-annotated preference
+prior, then check whether the residual bias disappears once the model is
+explicitly asked to flag its own uncertainty (`I am not sure which cube`)
+before grounding. This is the experiment that decides whether the bias is
+correctable or structural. Second,
 **move the spectrum to a policy that actually executes.** The grounding layer
 here is measured in isolation, with motor control decoupled. Re-running the
 same six families on an end-to-end policy — where a wrong grounding costs a
@@ -213,24 +253,25 @@ failed episode, not a mismatched colour — measures whether the pragmatic
 boundary survives the full stack, and whether action-space reasoning (the
 design the ACoT-VLA line proposes) shifts it. Third, **open the object set.**
 A closed four-colour set cannot distinguish a bias over learned colour names
-from a bias over *anything* in the bottom half of the frame; a scene with an
-open vocabulary of targets would resolve that, and would tell us whether the
-saliency prior generalises or is an artefact of this specific layout.
+from a bias over *anything* salient in the frame; a scene with an open
+vocabulary of targets would resolve that, and would tell us whether the
+prior is over colour semantics or over visual saliency.
 
 The first of these is a direct fix; the second and third are the boundary
-conditions on whether the finding transfers beyond a single simulated scene.
+conditions on whether the finding transfers beyond a closed four-colour
+set.
 
 ### 4.2 Limitations
 
-- **One scene, one seed, one checkpoint.** All 120 cells run in a single
-  deterministic robosuite scene (four cubes of fixed size/position/colour) with
-  a single random seed and a single Qwen2.5-VL checkpoint. The 100%/55%/25%
-  split is a statement about *this* policy on *this* layout; scene geometry,
-  seed, and model all plausibly shift the boundary. We report exact
-  reproducibility as the trade-off for coverage.
+- **One task family, one seed, one checkpoint.** All 480 cells (4 layouts ×
+  120) run on the same deterministic robusuite task — four cubes of fixed
+  size/position, colour-permuted — with a single random seed and a single
+  Qwen2.5-VL checkpoint. The 100%/55%/25% profile is layout-invariant (§3.4),
+  but scene geometry, seed, and model all plausibly shift the boundary. We
+  report exact reproducibility as the trade-off for coverage.
 - **n = 20 per cell.** Wilson 95% CIs are correspondingly wide (coref 0.55 →
   [0.34, 0.74]). The *direction* of the pragmatic/lexical split is robust
-  (Fisher exact p = 7.9×10⁻⁶ on the phrase-anchor switch), but the precise
+  (Fisher exact p = 5.8×10⁻¹⁵ in every layout), but the precise
   level of each family is a point estimate, not a law.
 - **Grounded-policy observation, not end-to-end VLA.** Instructions are executed
   by the same Qwen2.5-VL model that grounds them, but the policy is a
@@ -272,10 +313,10 @@ not lexical ones — are where the open-vocabulary boundary breaks.
 **Saliency and prior biases in manipulation policies.** Prior work has
 observed that policies inherit object biases from their training data (e.g.,
 colour preferences in tabletop manipulation [8]). We make the bias
-measurable: under unconstrained instructions the policy never grounds to the
-two smaller lower-frame cubes (all 20 trials; four-colour uniformity χ² p = 7.9×10⁻⁵,
-and a two-colour fallback set with probability 0.5²⁰ = 9.5×10⁻⁷), and the exact
-anchor is a deterministic function of the surface phrasing (Fisher exact
+measurable: under unconstrained instructions the fallback is non-uniform in
+every one of four colour-permuted layouts (χ² p ≤ 7.9×10⁻⁵ each), the anchor
+colour moves with the layout, and in the original layout the anchor is a
+deterministic function of the surface phrasing (Fisher exact
 p = 7.9×10⁻⁶). What was a qualitative anecdote becomes a statistically
 testable, and therefore correctable, prior.
 
@@ -285,8 +326,10 @@ testable, and therefore correctable, prior.
 - **Environment:** custom `MultiLift` (robosuite 1.4.1 / MuJoCo 2.3.7),
   deterministic per seed, agentview camera @ 256×256
 - **Execution:** CPU software rendering (llvmpipe); CUDA for the VLM
-- **Full sweep:** 120 cells (6 families × 4 colours × 5 variants)
-- **Data:** `data/sweep/sweep.json`, `data/sweep/summary.json`
+- **Full sweep:** 480 cells (6 families × 4 colours × 5 variants × 4 layouts)
+- **Data:** `data/sweep/sweep.json`, `data/sweep/summary.json`,
+  `data/sweep_v1..v3/sweep.json`; cross-layout claims re-derived by
+  `scripts/cross_scene_facts.py`
 
 ## References
 

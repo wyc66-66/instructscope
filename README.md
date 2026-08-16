@@ -31,15 +31,22 @@ wasted.
 | **ambiguous** | `Pick up a cube.` | **25%** |
 
 Lexical perturbations are fully absorbed; pragmatic perturbations are not.
-Under underspecified instructions the policy never grounds to the two smaller
-lower-frame cubes — it deterministically anchors to one of the two visually
-dominant cubes, and the exact anchor switches with the surface phrasing
-(χ² uniformity p = 7.9×10⁻⁵; Fisher exact p = 7.9×10⁻⁶). The failures reveal a
-measurable, phrase-sensitive **saliency prior**, not noise.
+Under underspecified instructions the fallback is systematically biased — in
+the original layout it anchors to the two visually dominant cubes and the
+exact anchor switches with the surface phrasing (χ² uniformity p = 7.9×10⁻⁵;
+Fisher exact p = 7.9×10⁻⁶). The failures reveal a measurable **saliency
+prior**, not noise.
 
-**Scale:** 6 perturbation families × 4 colours × 5 variants = **120
-deterministic cells**, every cell re-grounded across the full perturbation
-bank with exact reproducibility (one committed scene, one checkpoint).
+**Scale:** 6 perturbation families × 4 colours × 5 variants × 4 layouts =
+**480 deterministic cells** — the full 120-cell grid runs on the original
+scene and on three colour-permuted re-arrangements. Every cell re-grounded
+across the full perturbation bank with exact reproducibility (committed
+scenes, one checkpoint).
+
+**Cross-layout stability:** the 100%/55%/25% profile is layout-invariant
+(Fisher exact p = 5.8×10⁻¹⁵ in each of the four layouts); the fallback anchor
+moves with the layout; the original phrase-sensitivity does not transfer
+(§3.4 of the report).
 
 ## Repository layout
 

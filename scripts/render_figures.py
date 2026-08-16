@@ -5,6 +5,8 @@ Figure 1: per-family success rates with Wilson 95% intervals.
 Figure 2: ambiguous-family saliency prior (fallback distribution + the
           phrase-sensitive anchor switch).
 Figure 3: confusion matrix over predicted vs target colour.
+Figure 4: cross-layout ambiguous fallback across colour->position
+          permutations (requires --variants).
 """
 from __future__ import annotations
 
@@ -17,7 +19,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-
+import json
+from scipy import stats
 from instructscope.analysis import load_sweep, summarize
 
 FAMILY_LABELS = {
@@ -148,14 +151,53 @@ def fig_confusion(summary: dict, out: Path):
     plt.close(fig)
 
 
+def fig_cross_layout(sweep_paths: dict[str, Path], out: Path):
+    """Cross-layout ambiguous fallback: does the biased prior survive a colour->position
+    permutation? Four deterministic layouts; the *anchor colour* moves with the layout,
+    the *biased non-uniform fallback* does not."""
+    fig, ax = plt.subplots(figsize=(9.2, 3.6))
+    x = np.arange(len(sweep_paths))
+    width = 0.2
+    colours = ["red", "blue", "green", "yellow"]
+    for ci, c in enumerate(colours):
+        vals = []
+        for name, p in sweep_paths.items():
+            data = json.loads(p.read_text(encoding="utf-8"))
+            amb = [r for r in data["records"] if r["family"] == "ambiguous"]
+            n = sum(1 for r in amb if r["predicted"] == c)
+            vals.append(n)
+        bars = ax.bar(x + (ci - 1.5) * width, vals, width, color=COLOR_HEX[c],
+                      edgecolor="black", linewidth=0.5, label=c.capitalize())
+    for i, (name, p) in enumerate(sweep_paths.items()):
+        data = json.loads(p.read_text(encoding="utf-8"))
+        amb = [r for r in data["records"] if r["family"] == "ambiguous"]
+        counts = {c: sum(1 for r in amb if r["predicted"] == c) for c in colours}
+        chi2 = sum((counts[c] - len(amb) / 4) ** 2 / (len(amb) / 4) for c in colours)
+        up = float(stats.chi2.sf(chi2, df=3))
+        ax.text(i, len(amb) + 0.6, f"χ² p = {up:.0e}", ha="center", fontsize=8.5)
+    ax.axhline(5, color="#7f8c8d", lw=0.8, ls="--", label="uniform (20/4)")
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"L{n}" for n in range(len(sweep_paths))])
+    ax.set_ylabel("Ambiguous fallbacks")
+    ax.set_ylim(0, 22)
+    ax.set_title("Cross-layout: the biased fallback survives a colour–position permutation\n"
+                 "the anchor colour moves with the layout; the non-uniform prior does not",
+                 fontsize=10.5)
+    ax.legend(frameon=False, ncol=3, loc="upper right", fontsize=8)
+    fig.tight_layout()
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     import argparse
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--sweep", default="data/sweep/sweep.json", type=Path)
     ap.add_argument("--out", default="docs/figures", type=Path)
+    ap.add_argument("--variants", nargs="*", default=[],
+                    help="additional sweep.json paths for the cross-layout figure")
     args = ap.parse_args()
-
     args.out.mkdir(parents=True, exist_ok=True)
     data = load_sweep(args.sweep)
     summary = summarize(data)
@@ -164,6 +206,13 @@ def main():
     fig_saliency(summary, args.out / "fig2_saliency_bias.png")
     fig_confusion(summary, args.out / "fig3_confusion.png")
     print(f"[figures] wrote 3 figures -> {args.out}")
+
+    if args.variants:
+        paths = {"L0": args.sweep}
+        for i, v in enumerate(args.variants, start=1):
+            paths[f"L{i}"] = Path(v)
+        fig_cross_layout(paths, args.out / "fig4_cross_layout.png")
+        print(f"[figures] wrote cross-layout figure -> {args.out / 'fig4_cross_layout.png'}")
 
     # also persist summary next to the sweep
     summary_path = args.sweep.parent / "summary.json"
