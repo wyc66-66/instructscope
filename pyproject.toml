@@ -5,12 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "instructscope"
 version = "0.1.0"
-description = "Where instruction perturbations break open-vocabulary VLA policies"
+description = "Where instruction perturbations break open-vocabulary policy grounding"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy",
     "pillow",
+    "scipy",
 ]
 
 [project.optional-dependencies]
@@ -35,3 +36,7 @@ ui = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]

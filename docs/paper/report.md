@@ -1,8 +1,8 @@
-# InstructScope: Where Instruction Perturbations Break Open-Vocabulary VLA Policies
+# InstructScope: Where Instruction Perturbations Break Open-Vocabulary Policy Grounding
 
 *An empirical reliability boundary of language-grounded robot manipulation*
 
-**Model under test:** Qwen2.5-VL-3B-Instruct (open-vocabulary multimodal policy backbone)
+**Model under test:** Qwen2.5-VL-3B-Instruct, used as the open-vocabulary grounding layer of a pick-and-place policy
 **Task:** tabletop pick-and-place on a custom `MultiLift` robosuite environment (four colour-distinct cubes)
 **Metric:** grounded-success rate — the fraction of instructions whose grounded colour matched the intended target
 
@@ -10,21 +10,25 @@
 
 ## Abstract
 
-Open-vocabulary vision-language-action (VLA) policies promise to generalise
-to instructions that were never seen during training. But how *far* does that
-generalisation reach? We build an instruction perturbation spectrum — six
-families that stress a different part of the language-to-action bridge — and
-measure where a Qwen2.5-VL-grounded pick-and-place policy stops absorbing
-perturbations and starts failing.
+Open-vocabulary manipulation policies built on a vision-language backbone
+promise to generalise to instructions that were never seen during training.
+But how *far* does that generalisation reach? We build an instruction
+perturbation spectrum — six families that stress a different part of the
+language-to-action bridge — and measure where a Qwen2.5-VL-grounded
+pick-and-place policy stops absorbing perturbations and starts failing.
 
 The result is a crisp boundary. **Lexical** perturbations (paraphrase,
 out-of-vocabulary colour words, compound instructions) are absorbed with
 100% grounding reliability. **Pragmatic** perturbations are not: deictic /
 coreference instructions (`pick up that cube`, `the one on the left`) drop to
 55%, and unconstrained instructions (`pick up a cube`) fall to 25% — and the
-failures are not random. Under ambiguity the policy falls back to a single
-visually salient colour with perfect consistency, revealing a *saliency bias*
-inherited from its training distribution.
+failures are not random. Under under-specification the policy never grounds to
+the two smaller cubes in the lower half of the agentview frame: it
+deterministically anchors to one of the two visually dominant cubes (blue,
+yellow) on all 20 trials, and *which* anchor is selected switches with the
+surface phrasing of the otherwise-equivalent instruction (Fisher exact
+p = 7.9×10⁻⁶). The failures reveal a measurable, phrase-sensitive **saliency
+prior**, not noise.
 
 ## 1. Motivation
 
@@ -35,16 +39,20 @@ describe objects with words the policy has never seen, and they occasionally
 leave the target under-specified.
 
 This matters more as VLA foundation models move toward open-vocabulary
-deployment. The AgiBot World platform [1] — over a million real-robot
-manipulation trajectories across 217 tasks — and its GO-1 foundation model [2]
-explicitly target generalisation beyond the training distribution: GO-1's
-ViLLA (Vision-Language-Latent-Action) architecture bridges the semantic-
-kinematic gap by predicting latent action tokens, and the evaluation reports
-strong average gains over prior policies. But the reliability of such a policy
-is reported as a single number over canonical instruction templates. How far the
-*language* generalisation actually reaches — which instruction perturbations
-are absorbed and which break grounding — is the open question this project
-measures.
+deployment. ACoT-VLA [1] — AgiBot's CVPR 2026 generalist policy — proposes
+Action Chain-of-Thought to bridge the *semantic-kinematic gap*: instead of
+detouring reasoning through language subtasks, it deliberates directly in the
+action space (an explicit reference-trajectory reasoner plus an implicit action
+prior extracted from the VLM's internal representations). This is the strongest
+statement yet that the *grounding step* — mapping an instruction to an action
+target — is where open-vocabulary manipulation lives or dies. Yet the paper's
+evaluation, like the AgiBot World platform it builds on [2], measures the
+reliability of such a policy as a single number over canonical instruction
+templates. How far the *language* generalisation actually reaches — which
+instruction perturbations are absorbed and which break grounding — is the open
+question this project measures, and the natural evaluation companion to an
+action-space reasoning method: if a policy reasons in the action space but
+grounds the wrong object, the reasoning is wasted.
 
 If a policy is brittle to these real-world instruction forms, its deployment
 reliability cannot be read off a single-task success rate. This project
@@ -66,6 +74,11 @@ the policy.
 Every cell is fully deterministic: 4 colours × 5 variants × fixed scene.
 Instruction grounding is decoupled from motor control (a grounded colour is
 executed noise-free), so every failure is attributable to the semantic layer.
+
+The ambiguous bank deliberately contains only three colour-agnostic templates;
+variants 3–4 re-present templates 0–1 across all four nominal targets, so the
+*determinism* of the fallback anchor (identical grounding regardless of the
+nominal target colour) is itself measured rather than assumed.
 
 ## 3. Results
 
@@ -96,25 +109,46 @@ the same target, and the policy absorbs all of them. Two findings stand out:
 
 ### 3.2 Pragmatic fragility: the boundary is real
 
-**Coreference instructions drop to 55%.** The failures cluster into two
-mechanisms:
+**Coreference instructions drop to 55%, and the loss is fully explained by
+two mechanisms.**
 
-- *Vacuous deixis:* `pick up that cube` — with no disambiguating content, the
-  model falls back to a position heuristic (it tends to choose the cube near
-  the visual centre of the agentview image).
-- *Spatial reference error:* `the one that is leftmost` / `nearest to you`
-  — the model's spatial-preposition grounding is unreliable in this camera
-  frame.
+| Sub-family | Example | n | Success |
+|---|---|---|---|
+| vacuous deixis | `Pick up that cube.` (no antecedent) | 8 | 25% |
+| spatial reference | `Take the one that is rightmost.` | 4 | 25% |
+| appositive | `Grab it — the blue one.` | 4 | 100% |
+| attribute search | `Pick up the first one you see that is blue.` | 4 | 100% |
+
+- *Vacuous deixis.* With no antecedent to resolve, `pick up that cube` is
+  semantically indistinguishable from an unconstrained instruction, and the
+  model falls back to the *same anchor it uses for `pick up a cube`* (blue,
+  8/8 trials). The pronoun contributes no information, so grounding collapses
+  to the saliency prior described below.
+- *Spatial reference error.* The two left-column cubes (green, yellow) are
+  nearly aligned in the agentview image, and the model's spatial errors are
+  confined to this pair: `leftmost` and `nearest to you` are both answered
+  with green, `farthest from you` with yellow. Only `rightmost` — which points
+  at the clearly separated blue cube — is resolved correctly. When the
+  candidate set is nearly aligned, spatial prepositions degrade into a fixed
+  preference rather than a geometric computation.
 
 **Ambiguous instructions drop to 25%, and the failures are systematic.**
 
-![Saliency bias](../figures/fig2_saliency_bias.png)
+![Saliency prior](../figures/fig2_saliency_bias.png)
 
-`Pick up any cube you like` is grounded to **yellow** on 15/15 non-yellow
-targets. The policy has a strong, deterministic saliency prior: when the
-instruction imposes no constraint, the visually salient object wins. This is
-not noise — it is a measurable bias in the open-vocabulary policy's default
-behaviour.
+Under a fully unconstrained instruction the policy never grounds to the two
+smaller cubes in the lower half of the agentview frame (red, green): all 20
+fallbacks land on the two visually dominant cubes — blue on 12, yellow on 8
+(binomial p = 9.5×10⁻⁷ vs. uniform). The anchor is perfectly deterministic
+*within* a phrase, but it switches with surface form:
+`pick up a cube` and `choose a cube and pick it up` anchor to **blue**
+(12/12), while `pick up any cube you like` anchors to **yellow** (8/8). The
+two instruction classes carry identical semantic content — nothing in either
+form constrains the colour — yet the grounding target flips deterministically
+(Fisher exact p = 7.9×10⁻⁶). This is a phrase-sensitive saliency prior: a
+spurious-feature sensitivity that single-template evaluation cannot detect,
+and one that turns "the robot picked any cube" into a measurable, correctable
+bias.
 
 ### 3.3 Confusion structure
 
@@ -122,8 +156,8 @@ behaviour.
 
 The confusion matrix across all perturbation families confirms the story:
 the diagonal dominates (target-preserving grounding), and the only notable
-off-diagonal mass flows *toward* the salient colour under ambiguous
-instructions.
+off-diagonal mass flows *toward the two visually dominant anchor colours*
+(blue and yellow) under ambiguous and vacuous-deictic instructions.
 
 ## 4. Discussion
 
@@ -137,43 +171,51 @@ instruction space**:
    on context (deixis, spatial deixis, underspecification), grounding
    reliability collapses — and in a *biased* rather than random direction.
 
-This has a concrete deployment implication: an open-vocabulary VLA cannot be
-trusted with under-specified instructions; a safe deployment either resolves
-references before execution or treats `pick up a cube` as a request for
-human clarification. The saliency prior is stable and measurable, which means
-it can be corrected — a natural next step is calibrating the fallback
-distribution against a human-annotated preference prior.
+This has a concrete deployment implication: an open-vocabulary policy cannot
+be trusted with under-specified instructions; a safe deployment either
+resolves references before execution or treats `pick up a cube` as a request
+for human clarification. Because the saliency prior is stable, deterministic
+*and* phrase-sensitive, it is correctable: a natural next step is calibrating
+the fallback distribution against a human-annotated preference prior, and
+probing whether the phrase-dependence disappears once the model is explicitly
+asked to flag its own uncertainty.
 
-## 4. Related Work
+## 5. Related Work
 
 **VLA foundation models and open-vocabulary policies.** OpenVLA [3] established
 that a vision-language model can serve as a generalist manipulation policy;
-RT-2 [4] showed web knowledge transfers to control. On the scale axis, the
-AgiBot World platform [1] and its GO-1 foundation model [2] demonstrate that
-massive real-robot data plus a latent-action planner (ViLLA) yields strong
+RT-2 [4] showed web knowledge transfers to control. On the reasoning axis,
+ACoT-VLA [1] (AgiBot, CVPR 2026) reframes the semantic-kinematic gap by making
+the policy deliberate directly in the action space, with an explicit
+reference-trajectory reasoner (EAR) and an implicit action prior from the VLM's
+internal representations (IAR); on the scale axis, the AgiBot World platform
+[2] and its GO-1 foundation model (ViLLA, documented in [2]) demonstrate that
+massive real-robot data plus a latent-action planner yields strong
 generalisation. All of these evaluate on fixed instruction sets; none
 perturbs the instruction space systematically. Our spectrum study is
 complementary: it measures the *boundary* of the generalisation these systems
-claim.
+claim — the grounding reliability on which an action-space reasoner depends.
 
 **Language robustness for instruction following.** In NLP, instruction
-perturbation analysis is mature — paraphrase sensitivity [5], adversarial
-instruction attacks [6], and prompt robustness [7] are standard concerns. The
+perturbation analysis is mature — paraphrase sensitivity [4], adversarial
+instruction attacks [5], and prompt robustness [6] are standard concerns. The
 robotic literature has borrowed the evaluation protocol but not the
 perturbation taxonomy: physical-robot studies report aggregate success under
-manually varied phrasings [8]. We contribute a deterministic, six-family
+manually varied phrasings [7]. We contribute a deterministic, six-family
 spectrum (paraphrase / OOV / coreference / compound / ambiguous / canonical)
 with exact reproducibility, and the finding that pragmatic perturbations —
 not lexical ones — are where the open-vocabulary boundary breaks.
 
-**Saliency and prior biases in VLA policies.** Prior work has observed that
-VLA policies inherit object biases from their training data (e.g., colour
-preferences in tabletop manipulation [9]). We make the bias measurable: under
-unconstrained instructions, the policy grounds to a single visually salient
-colour with perfect consistency (15/15), which turns a qualitative anecdote
-into a statistically testable claim (Fisher exact p < 0.01).
+**Saliency and prior biases in manipulation policies.** Prior work has
+observed that policies inherit object biases from their training data (e.g.,
+colour preferences in tabletop manipulation [8]). We make the bias
+measurable: under unconstrained instructions the policy never grounds to the
+two smaller lower-frame cubes (20/20; binomial p = 9.5×10⁻⁷), and the exact
+anchor is a deterministic function of the surface phrasing (Fisher exact
+p = 7.9×10⁻⁶). What was a qualitative anecdote becomes a statistically
+testable, and therefore correctable, prior.
 
-## 5. Reproducibility
+## 6. Reproducibility
 
 - **Model:** `Qwen/Qwen2.5-VL-3B-Instruct`, bf16, offline
 - **Environment:** custom `MultiLift` (robosuite 1.4.1 / MuJoCo 2.3.7),
@@ -184,11 +226,14 @@ into a statistically testable claim (Fisher exact p < 0.01).
 
 ## References
 
-1. AgiBot World Team, et al. AgiBot World Colosseo: A Large-Scale Manipulation
+1. Zhong L., Liu Y., Wei Y., Xiong Z., Yao M., Liu S., Ren G. ACoT-VLA: Action
+   Chain-of-Thought for Vision-Language-Action Models. *CVPR 2026*.
+   arXiv:2601.11404. (Official AgiBot implementation:
+   github.com/AgibotTech/ACoT-VLA.)
+2. AgiBot World Team, et al. AgiBot World Colosseo: A Large-Scale Manipulation
    Platform for Scalable and Intelligent Embodied Systems. *arXiv:2503.06669*,
-   2025.
-2. AgiBot World Team. GO-1: A Generalist Embodied Foundation Model (ViLLA:
-   Vision-Language-Latent-Action). *AgiBot technical report*, 2025.
+   2025. (Also documents the GO-1 foundation model and its ViLLA
+   Vision-Language-Latent-Action architecture.)
 3. Kim M., Pertsch K., Karamcheti S., et al. OpenVLA: An Open-Source
    Vision-Language-Action Model. *CoRL 2024*.
 4. Brohan A., Brown N., Carbajal J., et al. RT-2: Vision-Language-Action Models
@@ -198,8 +243,10 @@ into a statistically testable claim (Fisher exact p < 0.01).
 6. Wallace E., Feng S., Kandpal N., Gardner M., Singh S. Universal Adversarial
    Triggers for Attacking and Analyzing NLP. *EMNLP 2019*.
 7. Sclar M., Choi Y., Tsvetkov Y., Suhr A. Quantifying Language Models'
-   Sensitivity to Spurious Features in Prompt Design. *EMNLP 2024*.
+   Sensitivity to Spurious Features in Prompt Design. *ICLR 2024*.
 8. Stone A., Xiao T., Lu Y., et al. Open-World Object Manipulation Using
    Pre-Trained Vision-Language Models. *CoRL 2023*.
 9. Lynch C., Wahid A., Tompson J., et al. Interactive Language: Talking to
    Robots in Real Time. *RA-L 2023*.
+10. Driess D., Xia F., Sajjadi M.S.M., et al. PaLM-E: An Embodied
+    Multimodal Language Model. *ICML 2023*.

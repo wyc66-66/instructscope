@@ -47,3 +47,8 @@ def sweep_json():
 
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+# The dashboard references its assets (vendor/chart.umd.min.js) relative to the
+# page root — the same layout GitHub Pages serves. Mount the static directory at
+# the root as a fallback so the local dashboard behaves identically to the
+# deployed one.
+app.mount("/", StaticFiles(directory=STATIC), name="static_root")

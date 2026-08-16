@@ -1,6 +1,6 @@
 {
   "meta": {
-    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "model": "/mnt/d/ccfa/.hf_cache/hub/models--Qwen--Qwen2.5-VL-3B-Instruct/snapshots/66285546d2b821cf421d4f5eb2576359d3770cd3",
     "colors": [
       "red",
       "blue",
@@ -23,7 +23,8 @@
       256,
       256
     ],
-    "scene": "data/scenes/scene_seed0.png"
+    "scene": "data/scenes/scene_seed0.png",
+    "scene_sha256": "4eaa8e5e7383ec4e0e43378cf1bffa1d36a93b4d0cd7d988615cb1de19daf3ee"
   },
   "per_family": [
     {
@@ -75,35 +76,141 @@
       "ci_hi": 0.4687050099580636
     }
   ],
-  "saliency": {
-    "yellow": 20
+  "default_analysis": {
+    "ambiguous": {
+      "n": 20,
+      "n_grounded": 20,
+      "counts": {
+        "red": 0,
+        "blue": 12,
+        "green": 0,
+        "yellow": 8
+      },
+      "most": {
+        "colour": "blue",
+        "count": 12
+      },
+      "uniform_p": 7.900461658679827e-05,
+      "two_colour": {
+        "colours": [
+          "blue",
+          "yellow"
+        ],
+        "count": 20,
+        "p": 9.5367431640625e-07
+      },
+      "phrase_anchor": [
+        {
+          "phrase": "Pick up a cube.",
+          "n": 8,
+          "anchor": "blue",
+          "count": 8
+        },
+        {
+          "phrase": "Pick up any cube you like.",
+          "n": 8,
+          "anchor": "yellow",
+          "count": 8
+        },
+        {
+          "phrase": "Choose a cube and pick it up.",
+          "n": 4,
+          "anchor": "blue",
+          "count": 4
+        }
+      ],
+      "phrase_anchor_p": 7.93839803127729e-06
+    },
+    "coref": {
+      "n": 20,
+      "mechanisms": {
+        "vacuous": {
+          "n": 8,
+          "success": 2,
+          "rate": 0.25,
+          "ci_lo": 0.07147768885802763,
+          "ci_hi": 0.5907301208974108,
+          "anchors": [
+            "blue"
+          ]
+        },
+        "appositive": {
+          "n": 4,
+          "success": 4,
+          "rate": 1.0,
+          "ci_lo": 0.5100999795960008,
+          "ci_hi": 1.0,
+          "anchors": [
+            "blue",
+            "green",
+            "red",
+            "yellow"
+          ]
+        },
+        "spatial": {
+          "n": 4,
+          "success": 1,
+          "rate": 0.25,
+          "ci_lo": 0.045586062644636216,
+          "ci_hi": 0.6993639475573634,
+          "anchors": [
+            "blue",
+            "green",
+            "yellow"
+          ]
+        },
+        "other": {
+          "n": 4,
+          "success": 4,
+          "rate": 1.0,
+          "ci_lo": 0.5100999795960008,
+          "ci_hi": 1.0,
+          "anchors": [
+            "blue",
+            "green",
+            "red",
+            "yellow"
+          ]
+        }
+      },
+      "vacuous_anchor": {
+        "colour": "blue",
+        "count": 8
+      }
+    }
   },
-  "saliency_most": {
-    "colour": "yellow",
-    "count": 20,
-    "total": 20
-  },
-  "fisher_p": 0.001976284584980237,
   "confusion": {
     "red": {
       "red": 22,
-      "blue": 2,
+      "blue": 5,
       "green": 1,
-      "yellow": 5
+      "yellow": 2
     },
     "blue": {
-      "blue": 25,
-      "yellow": 5
+      "blue": 28,
+      "yellow": 2
     },
     "green": {
       "green": 22,
-      "blue": 2,
-      "yellow": 6
+      "blue": 5,
+      "yellow": 3
     },
     "yellow": {
-      "yellow": 27,
-      "blue": 2,
+      "yellow": 24,
+      "blue": 5,
       "green": 1
     }
-  }
+  },
+  "saliency": {
+    "red": 0,
+    "blue": 12,
+    "green": 0,
+    "yellow": 8
+  },
+  "saliency_most": {
+    "colour": "blue",
+    "count": 12,
+    "total": 20
+  },
+  "fisher_p": 7.93839803127729e-06
 }

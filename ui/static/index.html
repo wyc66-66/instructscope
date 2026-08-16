@@ -43,7 +43,7 @@
 <body>
 <header>
   <h1>InstructScope</h1>
-  <p>Where instruction perturbations break open-vocabulary VLA policies.
+  <p>Where instruction perturbations break open-vocabulary policy grounding.
      A Qwen2.5-VL-grounded pick-and-place policy is probed across an instruction
      perturbation spectrum — from paraphrases to deixis to under-specification —
      and we locate the reliability boundary of its language grounding.</p>
@@ -61,6 +61,11 @@
       <h3>Default-choice bias <small>· fallback colour under underspecified instructions</small></h3>
       <div class="chartbox"><canvas id="chartSal"></canvas></div>
       <p class="muted" id="salNote" style="margin-top:8px"></p>
+      <h3 style="margin-top:16px">Phrase-sensitive anchoring <small>· same intent, rephrased</small></h3>
+      <table id="phrTable">
+        <thead><tr><th>Instruction</th><th>Anchor</th><th>Consistency</th></tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
 
@@ -170,9 +175,24 @@ function renderSal() {
     }
   });
   document.getElementById("salNote").textContent =
-    `Underspecified instructions ("pick up a cube") fall back to ${sal.most.colour} ` +
-    `${sal.most.count}/${sal.n_grounded} times — a stable visual-saliency prior, not noise ` +
-    `(χ² vs uniform p=${(sal.uniform_p ?? 0).toFixed(4)}).`;
+    `Underspecified instructions never ground to the two smaller lower-frame cubes: ` +
+    `all ${sal.n_grounded}/${sal.n} fallbacks land on the visually dominant ` +
+    `{${sal.two_colour.colours.join(", ")}} pair ` +
+    `(binomial p=${sal.two_colour.p.toExponential(1)}) — a stable visual-saliency prior, not noise ` +
+    `(χ² vs uniform p=${(sal.uniform_p ?? 0).toExponential(1)}).`;
+  renderPhraseAnchors(sal.phrase_anchor);
+}
+
+function renderPhraseAnchors(phrases) {
+  const tb = document.querySelector("#phrTable tbody");
+  tb.innerHTML = (phrases || []).map(p => {
+    const det = p.count === p.n;
+    const tag = det
+      ? '<span class="tag ok">deterministic</span>'
+      : '<span class="tag fail">mixed</span>';
+    const dot = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${COLOR_HEX[p.anchor] || "#999"};margin-right:6px"></span>`;
+    return `<tr><td>${p.phrase}</td><td>${dot}${p.anchor}</td><td>${p.count}/${p.n} ${tag}</td></tr>`;
+  }).join("");
 }
 
 function renderFilters() {

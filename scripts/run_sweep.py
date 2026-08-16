@@ -16,6 +16,7 @@ Results are written as ``sweep.json`` with a ``meta`` block.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -75,6 +76,7 @@ def main():
         print(f"[sweep] resumed with {len(records)} existing records", flush=True)
 
     image = Image.open(args.scene).convert("RGB")
+    scene_sha = hashlib.sha256(Path(args.scene).read_bytes()).hexdigest()
     engine = GroundEngine(args.model)
 
     done = len(records)
@@ -103,6 +105,7 @@ def main():
                             "seeds": list(args.seeds),
                             "image_size": image.size,
                             "scene": str(args.scene),
+                            "scene_sha256": scene_sha,
                         },
                         "records": records,
                     }

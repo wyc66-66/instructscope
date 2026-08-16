@@ -1,12 +1,12 @@
 # InstructScope
 
-**Where instruction perturbations break open-vocabulary VLA policies.**
+**Where instruction perturbations break open-vocabulary policy grounding.**
 
-An empirical study of the *language grounding reliability boundary* of an
-open-vocabulary vision-language-action policy. A Qwen2.5-VL-grounded
-pick-and-place policy is probed across an **instruction perturbation
-spectrum** — paraphrase, out-of-vocabulary words, coreference, compound and
-ambiguous instructions — in a custom multi-object robosuite environment.
+An empirical study of the *language grounding reliability boundary* of a
+Qwen2.5-VL-grounded pick-and-place policy. The policy is probed across an
+**instruction perturbation spectrum** — paraphrase, out-of-vocabulary words,
+coreference, compound and ambiguous instructions — in a custom multi-object
+robosuite environment.
 
 ## Headline finding
 
@@ -20,9 +20,11 @@ ambiguous instructions — in a custom multi-object robosuite environment.
 | **ambiguous** | `Pick up a cube.` | **25%** |
 
 Lexical perturbations are fully absorbed; pragmatic perturbations are not.
-Under underspecified instructions the policy falls back to a single visually
-salient colour with perfect consistency — a measurable **saliency bias**
-inherited from its training distribution (Fisher exact p < 0.01).
+Under underspecified instructions the policy never grounds to the two smaller
+lower-frame cubes — it deterministically anchors to one of the two visually
+dominant cubes, and the exact anchor switches with the surface phrasing
+(binomial p = 9.5×10⁻⁷; Fisher exact p = 7.9×10⁻⁶). The failures reveal a
+measurable, phrase-sensitive **saliency prior**, not noise.
 
 ## Repository layout
 
@@ -87,7 +89,7 @@ If you use this in your work, cite it as a research artifact:
 
 ```
 Dong Hao (2026). InstructScope: Where instruction perturbations break
-open-vocabulary VLA policies. Technical report.
+open-vocabulary policy grounding. Technical report.
 ```
 ---
 

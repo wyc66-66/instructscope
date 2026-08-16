@@ -168,11 +168,12 @@ def make_instruction(family: str, color: str, variant: int = 0, seed: int = 0) -
     """Deterministically build one instruction for a family+color.
 
     ``variant`` selects among the template bank (per color where the family
-    distinguishes colours); ``seed`` is used only for families whose templates
-    are colour-agnostic (ambiguous) so different seeds can still yield
-    different variants per colour.
+    distinguishes colours). The ambiguous family's templates are colour-agnostic
+    by design (the instruction must not name the target); with five sweep
+    variants over a three-template bank, templates 0-1 are re-presented across
+    all nominal targets, which measures the *determinism* of the fallback
+    anchor rather than assuming it.
     """
-    rng = random.Random(seed)
     if family == "canonical":
         return Instruction(family, color, _CANONICAL[color], variant=0)
     if family == "paraphrase":
@@ -190,6 +191,6 @@ def make_instruction(family: str, color: str, variant: int = 0, seed: int = 0) -
         return Instruction(family, color, bank[variant % len(bank)], variant=variant)
     if family == "ambiguous":
         bank = _AMBIGUOUS[color]
-        idx = rng.randrange(len(bank))
+        idx = variant % len(bank)
         return Instruction(family, color, bank[idx], variant=idx)
     raise ValueError(f"unknown family {family!r}")

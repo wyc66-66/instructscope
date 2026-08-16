@@ -1,6 +1,6 @@
 {
   "meta": {
-    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "model": "/mnt/d/ccfa/.hf_cache/hub/models--Qwen--Qwen2.5-VL-3B-Instruct/snapshots/66285546d2b821cf421d4f5eb2576359d3770cd3",
     "colors": [
       "red",
       "blue",
@@ -23,7 +23,8 @@
       256,
       256
     ],
-    "scene": "data/scenes/scene_seed0.png"
+    "scene": "data/scenes/scene_seed0.png",
+    "scene_sha256": "4eaa8e5e7383ec4e0e43378cf1bffa1d36a93b4d0cd7d988615cb1de19daf3ee"
   },
   "records": [
     {
@@ -36,12 +37,24 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 1.593
+      "grounding_time": 1.147
     },
     {
       "family": "canonical",
       "color": "red",
       "variant": 1,
+      "seed": 0,
+      "instruction": "Pick up the red cube.",
+      "response": "red",
+      "predicted": "red",
+      "target": "red",
+      "success": true,
+      "grounding_time": 0.236
+    },
+    {
+      "family": "canonical",
+      "color": "red",
+      "variant": 2,
       "seed": 0,
       "instruction": "Pick up the red cube.",
       "response": "red",
@@ -53,18 +66,6 @@
     {
       "family": "canonical",
       "color": "red",
-      "variant": 2,
-      "seed": 0,
-      "instruction": "Pick up the red cube.",
-      "response": "red",
-      "predicted": "red",
-      "target": "red",
-      "success": true,
-      "grounding_time": 0.217
-    },
-    {
-      "family": "canonical",
-      "color": "red",
       "variant": 3,
       "seed": 0,
       "instruction": "Pick up the red cube.",
@@ -72,7 +73,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.146
+      "grounding_time": 0.254
     },
     {
       "family": "canonical",
@@ -84,7 +85,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.147
+      "grounding_time": 0.248
     },
     {
       "family": "canonical",
@@ -96,7 +97,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.169
+      "grounding_time": 0.244
     },
     {
       "family": "canonical",
@@ -108,7 +109,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.159
+      "grounding_time": 0.247
     },
     {
       "family": "canonical",
@@ -120,7 +121,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.16
+      "grounding_time": 0.254
     },
     {
       "family": "canonical",
@@ -132,7 +133,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.145
+      "grounding_time": 0.257
     },
     {
       "family": "canonical",
@@ -144,7 +145,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.141
+      "grounding_time": 0.259
     },
     {
       "family": "canonical",
@@ -156,7 +157,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.149
+      "grounding_time": 0.252
     },
     {
       "family": "canonical",
@@ -168,7 +169,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.202
+      "grounding_time": 0.247
     },
     {
       "family": "canonical",
@@ -180,12 +181,24 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.166
+      "grounding_time": 0.24
     },
     {
       "family": "canonical",
       "color": "green",
       "variant": 3,
+      "seed": 0,
+      "instruction": "Pick up the green cube.",
+      "response": "green",
+      "predicted": "green",
+      "target": "green",
+      "success": true,
+      "grounding_time": 0.233
+    },
+    {
+      "family": "canonical",
+      "color": "green",
+      "variant": 4,
       "seed": 0,
       "instruction": "Pick up the green cube.",
       "response": "green",
@@ -196,18 +209,6 @@
     },
     {
       "family": "canonical",
-      "color": "green",
-      "variant": 4,
-      "seed": 0,
-      "instruction": "Pick up the green cube.",
-      "response": "green",
-      "predicted": "green",
-      "target": "green",
-      "success": true,
-      "grounding_time": 0.145
-    },
-    {
-      "family": "canonical",
       "color": "yellow",
       "variant": 0,
       "seed": 0,
@@ -216,7 +217,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.144
+      "grounding_time": 0.241
     },
     {
       "family": "canonical",
@@ -228,7 +229,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.156
+      "grounding_time": 0.184
     },
     {
       "family": "canonical",
@@ -240,7 +241,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.153
+      "grounding_time": 0.176
     },
     {
       "family": "canonical",
@@ -252,7 +253,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.158
+      "grounding_time": 0.214
     },
     {
       "family": "canonical",
@@ -264,7 +265,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.217
+      "grounding_time": 0.159
     },
     {
       "family": "paraphrase",
@@ -276,7 +277,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.216
+      "grounding_time": 0.222
     },
     {
       "family": "paraphrase",
@@ -288,7 +289,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.154
+      "grounding_time": 0.179
     },
     {
       "family": "paraphrase",
@@ -300,7 +301,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.238
+      "grounding_time": 0.223
     },
     {
       "family": "paraphrase",
@@ -312,7 +313,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.176
+      "grounding_time": 0.159
     },
     {
       "family": "paraphrase",
@@ -324,7 +325,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.239
+      "grounding_time": 0.164
     },
     {
       "family": "paraphrase",
@@ -336,7 +337,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.156
+      "grounding_time": 0.181
     },
     {
       "family": "paraphrase",
@@ -348,7 +349,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.166
+      "grounding_time": 0.234
     },
     {
       "family": "paraphrase",
@@ -360,7 +361,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.169
+      "grounding_time": 0.233
     },
     {
       "family": "paraphrase",
@@ -372,7 +373,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.17
+      "grounding_time": 0.248
     },
     {
       "family": "paraphrase",
@@ -384,7 +385,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.179
+      "grounding_time": 0.242
     },
     {
       "family": "paraphrase",
@@ -396,7 +397,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.218
+      "grounding_time": 0.244
     },
     {
       "family": "paraphrase",
@@ -408,7 +409,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.155
+      "grounding_time": 0.23
     },
     {
       "family": "paraphrase",
@@ -420,7 +421,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.242
+      "grounding_time": 0.239
     },
     {
       "family": "paraphrase",
@@ -432,7 +433,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.268
+      "grounding_time": 0.231
     },
     {
       "family": "paraphrase",
@@ -444,7 +445,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.28
+      "grounding_time": 0.234
     },
     {
       "family": "paraphrase",
@@ -456,7 +457,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.296
+      "grounding_time": 0.246
     },
     {
       "family": "paraphrase",
@@ -468,7 +469,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.278
+      "grounding_time": 0.231
     },
     {
       "family": "paraphrase",
@@ -480,7 +481,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.265
+      "grounding_time": 0.229
     },
     {
       "family": "paraphrase",
@@ -492,7 +493,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.264
+      "grounding_time": 0.236
     },
     {
       "family": "paraphrase",
@@ -504,7 +505,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.251
+      "grounding_time": 0.235
     },
     {
       "family": "oov",
@@ -516,7 +517,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.255
+      "grounding_time": 0.225
     },
     {
       "family": "oov",
@@ -527,107 +528,107 @@
       "response": "red",
       "predicted": "red",
       "target": "red",
+      "success": true,
+      "grounding_time": 0.231
+    },
+    {
+      "family": "oov",
+      "color": "red",
+      "variant": 2,
+      "seed": 0,
+      "instruction": "Pick up the vermilion cube.",
+      "response": "red",
+      "predicted": "red",
+      "target": "red",
+      "success": true,
+      "grounding_time": 0.238
+    },
+    {
+      "family": "oov",
+      "color": "red",
+      "variant": 3,
+      "seed": 0,
+      "instruction": "Pick up the vermilion cube.",
+      "response": "red",
+      "predicted": "red",
+      "target": "red",
+      "success": true,
+      "grounding_time": 0.237
+    },
+    {
+      "family": "oov",
+      "color": "red",
+      "variant": 4,
+      "seed": 0,
+      "instruction": "Pick up the vermilion cube.",
+      "response": "red",
+      "predicted": "red",
+      "target": "red",
+      "success": true,
+      "grounding_time": 0.241
+    },
+    {
+      "family": "oov",
+      "color": "blue",
+      "variant": 0,
+      "seed": 0,
+      "instruction": "Pick up the cobalt cube.",
+      "response": "blue",
+      "predicted": "blue",
+      "target": "blue",
+      "success": true,
+      "grounding_time": 0.261
+    },
+    {
+      "family": "oov",
+      "color": "blue",
+      "variant": 1,
+      "seed": 0,
+      "instruction": "Pick up the cobalt cube.",
+      "response": "blue",
+      "predicted": "blue",
+      "target": "blue",
+      "success": true,
+      "grounding_time": 0.231
+    },
+    {
+      "family": "oov",
+      "color": "blue",
+      "variant": 2,
+      "seed": 0,
+      "instruction": "Pick up the cobalt cube.",
+      "response": "blue",
+      "predicted": "blue",
+      "target": "blue",
+      "success": true,
+      "grounding_time": 0.25
+    },
+    {
+      "family": "oov",
+      "color": "blue",
+      "variant": 3,
+      "seed": 0,
+      "instruction": "Pick up the cobalt cube.",
+      "response": "blue",
+      "predicted": "blue",
+      "target": "blue",
+      "success": true,
+      "grounding_time": 0.236
+    },
+    {
+      "family": "oov",
+      "color": "blue",
+      "variant": 4,
+      "seed": 0,
+      "instruction": "Pick up the cobalt cube.",
+      "response": "blue",
+      "predicted": "blue",
+      "target": "blue",
       "success": true,
       "grounding_time": 0.246
     },
     {
       "family": "oov",
-      "color": "red",
-      "variant": 2,
-      "seed": 0,
-      "instruction": "Pick up the vermilion cube.",
-      "response": "red",
-      "predicted": "red",
-      "target": "red",
-      "success": true,
-      "grounding_time": 0.261
-    },
-    {
-      "family": "oov",
-      "color": "red",
-      "variant": 3,
-      "seed": 0,
-      "instruction": "Pick up the vermilion cube.",
-      "response": "red",
-      "predicted": "red",
-      "target": "red",
-      "success": true,
-      "grounding_time": 0.213
-    },
-    {
-      "family": "oov",
-      "color": "red",
-      "variant": 4,
-      "seed": 0,
-      "instruction": "Pick up the vermilion cube.",
-      "response": "red",
-      "predicted": "red",
-      "target": "red",
-      "success": true,
-      "grounding_time": 0.25
-    },
-    {
-      "family": "oov",
-      "color": "blue",
-      "variant": 0,
-      "seed": 0,
-      "instruction": "Pick up the cobalt cube.",
-      "response": "blue",
-      "predicted": "blue",
-      "target": "blue",
-      "success": true,
-      "grounding_time": 0.245
-    },
-    {
-      "family": "oov",
-      "color": "blue",
-      "variant": 1,
-      "seed": 0,
-      "instruction": "Pick up the cobalt cube.",
-      "response": "blue",
-      "predicted": "blue",
-      "target": "blue",
-      "success": true,
-      "grounding_time": 0.25
-    },
-    {
-      "family": "oov",
-      "color": "blue",
-      "variant": 2,
-      "seed": 0,
-      "instruction": "Pick up the cobalt cube.",
-      "response": "blue",
-      "predicted": "blue",
-      "target": "blue",
-      "success": true,
-      "grounding_time": 0.24
-    },
-    {
-      "family": "oov",
-      "color": "blue",
-      "variant": 3,
-      "seed": 0,
-      "instruction": "Pick up the cobalt cube.",
-      "response": "blue",
-      "predicted": "blue",
-      "target": "blue",
-      "success": true,
-      "grounding_time": 0.25
-    },
-    {
-      "family": "oov",
-      "color": "blue",
-      "variant": 4,
-      "seed": 0,
-      "instruction": "Pick up the cobalt cube.",
-      "response": "blue",
-      "predicted": "blue",
-      "target": "blue",
-      "success": true,
-      "grounding_time": 0.259
-    },
-    {
-      "family": "oov",
       "color": "green",
       "variant": 0,
       "seed": 0,
@@ -636,7 +637,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.25
+      "grounding_time": 0.227
     },
     {
       "family": "oov",
@@ -648,7 +649,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.244
+      "grounding_time": 0.232
     },
     {
       "family": "oov",
@@ -660,7 +661,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.242
+      "grounding_time": 0.25
     },
     {
       "family": "oov",
@@ -672,7 +673,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.244
+      "grounding_time": 0.231
     },
     {
       "family": "oov",
@@ -684,7 +685,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.24
+      "grounding_time": 0.234
     },
     {
       "family": "oov",
@@ -696,7 +697,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.257
+      "grounding_time": 0.229
     },
     {
       "family": "oov",
@@ -708,7 +709,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.28
+      "grounding_time": 0.224
     },
     {
       "family": "oov",
@@ -720,7 +721,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.274
+      "grounding_time": 0.236
     },
     {
       "family": "oov",
@@ -732,7 +733,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.261
+      "grounding_time": 0.233
     },
     {
       "family": "oov",
@@ -744,7 +745,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.26
+      "grounding_time": 0.223
     },
     {
       "family": "coref",
@@ -756,7 +757,7 @@
       "predicted": "blue",
       "target": "red",
       "success": false,
-      "grounding_time": 0.272
+      "grounding_time": 0.226
     },
     {
       "family": "coref",
@@ -768,7 +769,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.25
+      "grounding_time": 0.229
     },
     {
       "family": "coref",
@@ -780,7 +781,7 @@
       "predicted": "green",
       "target": "red",
       "success": false,
-      "grounding_time": 0.236
+      "grounding_time": 0.222
     },
     {
       "family": "coref",
@@ -792,7 +793,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.239
+      "grounding_time": 0.223
     },
     {
       "family": "coref",
@@ -804,7 +805,7 @@
       "predicted": "blue",
       "target": "red",
       "success": false,
-      "grounding_time": 0.237
+      "grounding_time": 0.232
     },
     {
       "family": "coref",
@@ -816,7 +817,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.162
+      "grounding_time": 0.241
     },
     {
       "family": "coref",
@@ -828,7 +829,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.239
+      "grounding_time": 0.249
     },
     {
       "family": "coref",
@@ -840,7 +841,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.236
+      "grounding_time": 0.226
     },
     {
       "family": "coref",
@@ -852,7 +853,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.234
+      "grounding_time": 0.246
     },
     {
       "family": "coref",
@@ -864,7 +865,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.224
+      "grounding_time": 0.238
     },
     {
       "family": "coref",
@@ -876,7 +877,7 @@
       "predicted": "blue",
       "target": "green",
       "success": false,
-      "grounding_time": 0.221
+      "grounding_time": 0.255
     },
     {
       "family": "coref",
@@ -888,7 +889,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.238
+      "grounding_time": 0.234
     },
     {
       "family": "coref",
@@ -900,7 +901,7 @@
       "predicted": "yellow",
       "target": "green",
       "success": false,
-      "grounding_time": 0.222
+      "grounding_time": 0.236
     },
     {
       "family": "coref",
@@ -912,7 +913,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.244
+      "grounding_time": 0.238
     },
     {
       "family": "coref",
@@ -924,7 +925,7 @@
       "predicted": "blue",
       "target": "green",
       "success": false,
-      "grounding_time": 0.246
+      "grounding_time": 0.23
     },
     {
       "family": "coref",
@@ -936,7 +937,7 @@
       "predicted": "blue",
       "target": "yellow",
       "success": false,
-      "grounding_time": 0.236
+      "grounding_time": 0.228
     },
     {
       "family": "coref",
@@ -948,7 +949,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.243
+      "grounding_time": 0.234
     },
     {
       "family": "coref",
@@ -960,7 +961,7 @@
       "predicted": "green",
       "target": "yellow",
       "success": false,
-      "grounding_time": 0.242
+      "grounding_time": 0.237
     },
     {
       "family": "coref",
@@ -972,7 +973,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.237
+      "grounding_time": 0.226
     },
     {
       "family": "coref",
@@ -984,7 +985,7 @@
       "predicted": "blue",
       "target": "yellow",
       "success": false,
-      "grounding_time": 0.253
+      "grounding_time": 0.241
     },
     {
       "family": "compound",
@@ -1008,7 +1009,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.253
+      "grounding_time": 0.24
     },
     {
       "family": "compound",
@@ -1020,7 +1021,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.242
+      "grounding_time": 0.239
     },
     {
       "family": "compound",
@@ -1032,7 +1033,7 @@
       "predicted": "red",
       "target": "red",
       "success": true,
-      "grounding_time": 0.241
+      "grounding_time": 0.225
     },
     {
       "family": "compound",
@@ -1056,7 +1057,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.237
+      "grounding_time": 0.224
     },
     {
       "family": "compound",
@@ -1080,7 +1081,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.238
+      "grounding_time": 0.247
     },
     {
       "family": "compound",
@@ -1092,7 +1093,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.252
+      "grounding_time": 0.234
     },
     {
       "family": "compound",
@@ -1104,7 +1105,7 @@
       "predicted": "blue",
       "target": "blue",
       "success": true,
-      "grounding_time": 0.257
+      "grounding_time": 0.24
     },
     {
       "family": "compound",
@@ -1116,7 +1117,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.253
+      "grounding_time": 0.233
     },
     {
       "family": "compound",
@@ -1128,7 +1129,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.257
+      "grounding_time": 0.237
     },
     {
       "family": "compound",
@@ -1140,7 +1141,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.26
+      "grounding_time": 0.237
     },
     {
       "family": "compound",
@@ -1152,7 +1153,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.25
+      "grounding_time": 0.23
     },
     {
       "family": "compound",
@@ -1164,7 +1165,7 @@
       "predicted": "green",
       "target": "green",
       "success": true,
-      "grounding_time": 0.253
+      "grounding_time": 0.228
     },
     {
       "family": "compound",
@@ -1176,7 +1177,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.379
+      "grounding_time": 0.241
     },
     {
       "family": "compound",
@@ -1188,7 +1189,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.265
+      "grounding_time": 0.235
     },
     {
       "family": "compound",
@@ -1200,7 +1201,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.254
+      "grounding_time": 0.236
     },
     {
       "family": "compound",
@@ -1212,7 +1213,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.255
+      "grounding_time": 0.239
     },
     {
       "family": "compound",
@@ -1224,19 +1225,19 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.262
+      "grounding_time": 0.245
     },
     {
       "family": "ambiguous",
       "color": "red",
       "variant": 0,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "red",
       "success": false,
-      "grounding_time": 0.26
+      "grounding_time": 0.235
     },
     {
       "family": "ambiguous",
@@ -1248,31 +1249,31 @@
       "predicted": "yellow",
       "target": "red",
       "success": false,
-      "grounding_time": 0.27
+      "grounding_time": 0.227
     },
     {
       "family": "ambiguous",
       "color": "red",
       "variant": 2,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Choose a cube and pick it up.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "red",
       "success": false,
-      "grounding_time": 0.255
+      "grounding_time": 0.241
     },
     {
       "family": "ambiguous",
       "color": "red",
       "variant": 3,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "red",
       "success": false,
-      "grounding_time": 0.253
+      "grounding_time": 0.239
     },
     {
       "family": "ambiguous",
@@ -1284,19 +1285,19 @@
       "predicted": "yellow",
       "target": "red",
       "success": false,
-      "grounding_time": 0.252
+      "grounding_time": 0.236
     },
     {
       "family": "ambiguous",
       "color": "blue",
       "variant": 0,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "blue",
-      "success": false,
-      "grounding_time": 0.252
+      "success": true,
+      "grounding_time": 0.225
     },
     {
       "family": "ambiguous",
@@ -1308,31 +1309,31 @@
       "predicted": "yellow",
       "target": "blue",
       "success": false,
-      "grounding_time": 0.255
+      "grounding_time": 0.238
     },
     {
       "family": "ambiguous",
       "color": "blue",
       "variant": 2,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Choose a cube and pick it up.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "blue",
-      "success": false,
-      "grounding_time": 0.252
+      "success": true,
+      "grounding_time": 0.226
     },
     {
       "family": "ambiguous",
       "color": "blue",
       "variant": 3,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "blue",
-      "success": false,
-      "grounding_time": 0.254
+      "success": true,
+      "grounding_time": 0.241
     },
     {
       "family": "ambiguous",
@@ -1344,19 +1345,19 @@
       "predicted": "yellow",
       "target": "blue",
       "success": false,
-      "grounding_time": 0.251
+      "grounding_time": 0.235
     },
     {
       "family": "ambiguous",
       "color": "green",
       "variant": 0,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "green",
       "success": false,
-      "grounding_time": 0.252
+      "grounding_time": 0.237
     },
     {
       "family": "ambiguous",
@@ -1368,31 +1369,31 @@
       "predicted": "yellow",
       "target": "green",
       "success": false,
-      "grounding_time": 0.273
+      "grounding_time": 0.237
     },
     {
       "family": "ambiguous",
       "color": "green",
       "variant": 2,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Choose a cube and pick it up.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "green",
       "success": false,
-      "grounding_time": 0.254
+      "grounding_time": 0.234
     },
     {
       "family": "ambiguous",
       "color": "green",
       "variant": 3,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "green",
       "success": false,
-      "grounding_time": 0.259
+      "grounding_time": 0.234
     },
     {
       "family": "ambiguous",
@@ -1404,19 +1405,19 @@
       "predicted": "yellow",
       "target": "green",
       "success": false,
-      "grounding_time": 0.25
+      "grounding_time": 0.232
     },
     {
       "family": "ambiguous",
       "color": "yellow",
       "variant": 0,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "yellow",
-      "success": true,
-      "grounding_time": 0.253
+      "success": false,
+      "grounding_time": 0.229
     },
     {
       "family": "ambiguous",
@@ -1428,31 +1429,31 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.249
+      "grounding_time": 0.221
     },
     {
       "family": "ambiguous",
       "color": "yellow",
       "variant": 2,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Choose a cube and pick it up.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "yellow",
-      "success": true,
-      "grounding_time": 0.26
+      "success": false,
+      "grounding_time": 0.235
     },
     {
       "family": "ambiguous",
       "color": "yellow",
       "variant": 3,
       "seed": 0,
-      "instruction": "Pick up any cube you like.",
-      "response": "yellow",
-      "predicted": "yellow",
+      "instruction": "Pick up a cube.",
+      "response": "blue",
+      "predicted": "blue",
       "target": "yellow",
-      "success": true,
-      "grounding_time": 0.254
+      "success": false,
+      "grounding_time": 0.235
     },
     {
       "family": "ambiguous",
@@ -1464,7 +1465,7 @@
       "predicted": "yellow",
       "target": "yellow",
       "success": true,
-      "grounding_time": 0.254
+      "grounding_time": 0.237
     }
   ]
 }

@@ -2,7 +2,8 @@
 """Render paper figures from the sweep summary.
 
 Figure 1: per-family success rates with Wilson 95% intervals.
-Figure 2: ambiguous-family saliency bias (fallback colour distribution).
+Figure 2: ambiguous-family saliency prior (fallback distribution + the
+          phrase-sensitive anchor switch).
 Figure 3: confusion matrix over predicted vs target colour.
 """
 from __future__ import annotations
@@ -67,30 +68,52 @@ def fig_success_rates(summary: dict, out: Path):
 
 
 def fig_saliency(summary: dict, out: Path):
-    sal = summary["saliency"]
-    total = summary["saliency_most"]["total"]
-    if not sal:
-        return
+    amb = summary["default_analysis"]["ambiguous"]
     colours = summary["meta"]["colors"]
-    counts = [sal.get(c, 0) for c in colours]
-    most = summary["saliency_most"]["colour"]
+    counts = [amb["counts"].get(c, 0) for c in colours]
+    phrases = amb["phrase_anchor"]
 
-    fig, ax = plt.subplots(figsize=(7.0, 3.6))
-    bars = ax.bar(range(len(colours)), counts, color=[COLOR_HEX[c] for c in colours],
-                  width=0.6, edgecolor="black", linewidth=0.6)
-    ax.set_xticks(range(len(colours)))
-    ax.set_xticklabels([c.capitalize() for c in colours])
-    ax.set_ylabel("Ambiguous instruction fallbacks")
-    ax.set_title(f"Saliency bias: unconstrained instructions fall back to "
-                 f"{most.capitalize()} ({summary['saliency_most']['count']}/{total})\n"
-                 f"Fisher exact p = {summary['fisher_p']:.4f}", fontsize=10)
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(11.0, 3.7), width_ratios=[1, 1.35])
+    fig.subplots_adjust(wspace=0.32)
+
+    # Left: overall fallback distribution vs uniform.
+    bars = axL.bar(range(len(colours)), counts, color=[COLOR_HEX[c] for c in colours],
+                   width=0.6, edgecolor="black", linewidth=0.6)
     for b, c in zip(bars, counts):
         if c:
-            ax.text(b.get_x() + b.get_width() / 2, c + 0.15, str(c),
-                    ha="center", va="bottom", fontsize=9)
-    ax.axhline(total / len(colours), color="#7f8c8d", lw=0.8, ls="--",
-               label=f"uniform ({total/len(colours):.1f})")
-    ax.legend(frameon=False)
+            axL.text(b.get_x() + b.get_width() / 2, c + 0.15, str(c),
+                     ha="center", va="bottom", fontsize=9)
+    axL.axhline(amb["n"] / len(colours), color="#7f8c8d", lw=0.8, ls="--",
+                label=f"uniform ({amb['n']/len(colours):.0f})")
+    axL.legend(frameon=False)
+    axL.set_xticks(range(len(colours)))
+    axL.set_xticklabels([c.capitalize() for c in colours])
+    axL.set_ylabel("Ambiguous instruction fallbacks")
+    axL.set_title(f"Fallback distribution (all {amb['n']} cells)\n"
+                  f"χ² vs uniform p = {amb['uniform_p']:.1e}", fontsize=10)
+
+    # Right: per-phrase anchor — same unconstrained intent, different surface
+    # form, different deterministic anchor.
+    x = np.arange(len(phrases))
+    for i, (pp, xi) in enumerate(zip(phrases, x)):
+        colour = pp["anchor"]
+        axR.bar(xi, pp["count"], width=0.55, color=COLOR_HEX.get(colour, "#999"),
+                edgecolor="black", linewidth=0.6)
+        axR.text(xi, pp["count"] + 0.1, f"{pp['count']}/{pp['n']}", ha="center",
+                 va="bottom", fontsize=9, fontweight="bold")
+        axR.text(xi, -0.55, colour.capitalize(), ha="center", va="top", fontsize=8.5,
+                 color=COLOR_HEX.get(colour, "#999"))
+    axR.set_xticks(x)
+    axR.set_xticklabels([p["phrase"] for p in phrases], fontsize=8)
+    axR.set_ylabel("Cells falling back to the anchor")
+    axR.set_ylim(0, max(p["n"] for p in phrases) + 1.2)
+    axR.set_title(f"Phrase-sensitive anchor (Fisher exact p = {amb['phrase_anchor_p']:.1e})",
+                  fontsize=10)
+    for s in axR.spines.values():
+        s.set_visible(False)
+
+    fig.suptitle("InstructScope: under-specification produces a deterministic, phrase-sensitive saliency prior",
+                 fontsize=11, y=1.02)
     fig.tight_layout()
     fig.savefig(out, bbox_inches="tight")
     plt.close(fig)
