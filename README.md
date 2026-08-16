@@ -89,14 +89,20 @@ pip install pytest
 #     one instruction before you commit to the full sweep
 python scripts/smoke_test.py
 
-# 1. render the deterministic scene once
+# 1. render the deterministic scene once (the canonical layout)
 python scripts/render_scenes.py --out data/scenes
 
-# 2. run the perturbation sweep (120 cells; checkpointed after every cell)
+# 2. run the perturbation sweep on the canonical layout (120 cells; checkpointed
+#    after every cell), then render and sweep the three colour-permuted scenes
 TRANSFORMERS_OFFLINE=1 python scripts/run_sweep.py --out data/sweep
+TRANSFORMERS_OFFLINE=1 python scripts/run_sweep.py --out data/sweep_v1
+TRANSFORMERS_OFFLINE=1 python scripts/run_sweep.py --out data/sweep_v2
+TRANSFORMERS_OFFLINE=1 python scripts/run_sweep.py --out data/sweep_v3
+#    (480 cells total across the four layouts; see scripts/render_scenes.py --colors)
 
-# 3. analyse + render figures + render the report
-python scripts/render_figures.py --sweep data/sweep/sweep.json
+# 3. analyse + render figures (pass the variant sweeps for the cross-layout figure) + render the report
+python scripts/cross_scene_facts.py --v0 data/sweep/sweep.json --v1 data/sweep_v1/sweep.json --v2 data/sweep_v2/sweep.json --v3 data/sweep_v3/sweep.json
+python scripts/render_figures.py --sweep data/sweep/sweep.json --variants data/sweep_v1/sweep.json data/sweep_v2/sweep.json data/sweep_v3/sweep.json
 python scripts/render_paper.py
 ```
 
@@ -128,6 +134,8 @@ python -m uvicorn instructscope.ui.app:app --port 8733
   every failure is attributable to the semantic grounding layer, not motor
   control
 - **Full grid:** 6 families × 4 colours × 5 variants = 120 deterministic cells
+  per layout, re-run on four colour-permuted layouts (480 cells total; the
+  pragmatic boundary is layout-invariant, §3.4 of the report)
 
 ---
 
