@@ -23,7 +23,7 @@ Lexical perturbations are fully absorbed; pragmatic perturbations are not.
 Under underspecified instructions the policy never grounds to the two smaller
 lower-frame cubes — it deterministically anchors to one of the two visually
 dominant cubes, and the exact anchor switches with the surface phrasing
-(binomial p = 9.5×10⁻⁷; Fisher exact p = 7.9×10⁻⁶). The failures reveal a
+(χ² uniformity p = 7.9×10⁻⁵; Fisher exact p = 7.9×10⁻⁶). The failures reveal a
 measurable, phrase-sensitive **saliency prior**, not noise.
 
 ## Repository layout
@@ -54,6 +54,14 @@ MuJoCo renderer never touches WSL's unstable GPU virtualisation layer; the
 VLM still runs on CUDA.
 
 ```bash
+# 0. install (analysis needs numpy/scipy; the sweep needs robosuite + the VLM)
+pip install -e ".[sim,gpu,paper,ui]"     # ~10 min; robosuite + torch
+pip install pytest
+
+# 0b. GPU smoke test (optional, ~1 min): verifies the engine loads and grounds
+#     one instruction before you commit to the full sweep
+python scripts/smoke_test.py
+
 # 1. render the deterministic scene once
 python scripts/render_scenes.py --out data/scenes
 
@@ -64,6 +72,17 @@ TRANSFORMERS_OFFLINE=1 python scripts/run_sweep.py --out data/sweep
 python scripts/render_figures.py --sweep data/sweep/sweep.json
 python scripts/render_paper.py
 ```
+
+> The `TRANSFORMERS_OFFLINE=1` / `LIBGL_ALWAYS_SOFTWARE=1` prefixes are bash
+> syntax; on Windows PowerShell use `$env:TRANSFORMERS_OFFLINE="1"; ...`.
+
+## Tests
+
+```bash
+python -m pytest -q        # 10 tests: Wilson intervals, saliency analysis, coref split
+```
+
+CI (`.github/workflows/ci.yml`) runs the suite on every push to `main`.
 
 ## Dashboard
 

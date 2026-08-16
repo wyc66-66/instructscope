@@ -119,6 +119,8 @@ def _coref_analysis(records: list[dict]) -> dict:
             return "vacuous"
         if any(w in t for w in ("leftmost", "rightmost", "nearest", "farthest")):
             return "spatial"
+        if "first one you see" in t:
+            return "attribute search"
         return "appositive" if "— the" in r["instruction"] else "other"
 
     groups: dict[str, list] = {}

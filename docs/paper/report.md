@@ -138,8 +138,11 @@ two mechanisms.**
 
 Under a fully unconstrained instruction the policy never grounds to the two
 smaller cubes in the lower half of the agentview frame (red, green): all 20
-fallbacks land on the two visually dominant cubes — blue on 12, yellow on 8
-(binomial p = 9.5×10⁻⁷ vs. uniform). The anchor is perfectly deterministic
+fallbacks land on the two visually dominant cubes — blue on 12, yellow on 8.
+Against a uniform four-colour null the distribution is strongly non-uniform
+(χ² = 20.0, df = 3, p = 7.9×10⁻⁵); equivalently, the probability that a fair
+fallback would land entirely in the observed two-colour set is 0.5²⁰ = 9.5×10⁻⁷.
+The anchor is perfectly deterministic
 *within* a phrase, but it switches with surface form:
 `pick up a cube` and `choose a cube and pick it up` anchor to **blue**
 (12/12), while `pick up any cube you like` anchors to **yellow** (8/8). The
@@ -180,6 +183,29 @@ the fallback distribution against a human-annotated preference prior, and
 probing whether the phrase-dependence disappears once the model is explicitly
 asked to flag its own uncertainty.
 
+### 4.1 Limitations
+
+- **One scene, one seed, one checkpoint.** All 120 cells run in a single
+  deterministic robosuite scene (four cubes of fixed size/position/colour) with
+  a single random seed and a single Qwen2.5-VL checkpoint. The 100%/55%/25%
+  split is a statement about *this* policy on *this* layout; scene geometry,
+  seed, and model all plausibly shift the boundary. We report exact
+  reproducibility as the trade-off for coverage.
+- **n = 20 per cell.** Wilson 95% CIs are correspondingly wide (coref 0.55 →
+  [0.34, 0.74]). The *direction* of the pragmatic/lexical split is robust
+  (Fisher exact p = 7.9×10⁻⁶ on the phrase-anchor switch), but the precise
+  level of each family is a point estimate, not a law.
+- **Grounded-policy observation, not end-to-end VLA.** Instructions are executed
+  by the same Qwen2.5-VL model that grounds them, but the policy is a
+  grounding→grasp pipeline in a simulated kitchen, not a pretrained
+  vision-language-action model. The saliency prior we expose is a property of
+  the *vision-language* grounding stage, which is precisely the stage every
+  VLA shares.
+- **Closed action set.** Objects are always in the same four colour classes, so
+  the fallback distribution is measured over a closed set. An open set would
+  test whether the bias is over *learned* colour names or over *anything* in
+  the bottom half of the frame.
+
 ## 5. Related Work
 
 **VLA foundation models and open-vocabulary policies.** OpenVLA [3] established
@@ -210,7 +236,8 @@ not lexical ones — are where the open-vocabulary boundary breaks.
 observed that policies inherit object biases from their training data (e.g.,
 colour preferences in tabletop manipulation [8]). We make the bias
 measurable: under unconstrained instructions the policy never grounds to the
-two smaller lower-frame cubes (20/20; binomial p = 9.5×10⁻⁷), and the exact
+two smaller lower-frame cubes (20/20; four-colour uniformity χ² p = 7.9×10⁻⁵,
+and a two-colour fallback set with probability 0.5²⁰ = 9.5×10⁻⁷), and the exact
 anchor is a deterministic function of the surface phrasing (Fisher exact
 p = 7.9×10⁻⁶). What was a qualitative anecdote becomes a statistically
 testable, and therefore correctable, prior.
