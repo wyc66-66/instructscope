@@ -37,6 +37,10 @@ dominant cubes, and the exact anchor switches with the surface phrasing
 (χ² uniformity p = 7.9×10⁻⁵; Fisher exact p = 7.9×10⁻⁶). The failures reveal a
 measurable, phrase-sensitive **saliency prior**, not noise.
 
+**Scale:** 6 perturbation families × 4 colours × 5 variants = **120
+deterministic cells**, every cell re-grounded across the full perturbation
+bank with exact reproducibility (one committed scene, one checkpoint).
+
 ## Repository layout
 
 ```

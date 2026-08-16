@@ -194,12 +194,33 @@ This has a concrete deployment implication: an open-vocabulary policy cannot
 be trusted with under-specified instructions; a safe deployment either
 resolves references before execution or treats `pick up a cube` as a request
 for human clarification. Because the saliency prior is stable, deterministic
-*and* phrase-sensitive, it is correctable: a natural next step is calibrating
-the fallback distribution against a human-annotated preference prior, and
-probing whether the phrase-dependence disappears once the model is explicitly
-asked to flag its own uncertainty.
+*and* phrase-sensitive, it is correctable.
 
-### 4.1 Limitations
+### 4.1 Future work
+
+Three directions follow from the boundary this study draws.
+
+First, **turn the saliency prior into a calibrated fallback.** The bias is
+deterministic and measurable, so it can be inverted: re-weight the fallback
+distribution against a human-annotated preference prior, then check whether
+the phrase-dependence disappears once the model is explicitly asked to flag
+its own uncertainty (`I am not sure which cube`) before grounding. This is the
+experiment that decides whether the bias is correctable or structural. Second,
+**move the spectrum to a policy that actually executes.** The grounding layer
+here is measured in isolation, with motor control decoupled. Re-running the
+same six families on an end-to-end policy — where a wrong grounding costs a
+failed episode, not a mismatched colour — measures whether the pragmatic
+boundary survives the full stack, and whether action-space reasoning (the
+design the ACoT-VLA line proposes) shifts it. Third, **open the object set.**
+A closed four-colour set cannot distinguish a bias over learned colour names
+from a bias over *anything* in the bottom half of the frame; a scene with an
+open vocabulary of targets would resolve that, and would tell us whether the
+saliency prior generalises or is an artefact of this specific layout.
+
+The first of these is a direct fix; the second and third are the boundary
+conditions on whether the finding transfers beyond a single simulated scene.
+
+### 4.2 Limitations
 
 - **One scene, one seed, one checkpoint.** All 120 cells run in a single
   deterministic robosuite scene (four cubes of fixed size/position/colour) with
